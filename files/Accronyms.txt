@@ -1,0 +1,4 @@
+QD : QuadDrone
+QDT: QuadDrone Test
+RWD: Rotary Wing Drone
+DAD: Dynamic Autonomous Drone

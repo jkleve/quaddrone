@@ -1,0 +1,14 @@
+PB5
+OC1A
+
+PB6
+OC1B
+
+PE3
+OC3A
+
+PE4
+OC3B
+
+1B
+TCK

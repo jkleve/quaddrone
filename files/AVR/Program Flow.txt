@@ -1,0 +1,17 @@
+Quad (Drone)
+
+* Contructor
+
+** sets initial default setting values
+
+* init
+
+** initialized motors (T2?)
+
+** starts heartbeat messages
+
+* start_heartbeat
+sets heartbeat_msg to true
+
+* stop_heartbeat
+sets heartbeat_msg to false

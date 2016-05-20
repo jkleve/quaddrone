@@ -1,0 +1,130 @@
+<html>
+	
+	<body>
+		<h1>Arduino</h1>
+			<p></p>
+		<h4><a href="http://www.arduino.cc/en/Main/ArduinoBoardMega2560">ATMega2560</a></h4>
+	
+		<ul>
+		
+			<li><a href="http://www.atmel.com/devices/ATmega2560.aspx?tab=documents">Datasheets</a></li>
+			<li><a href="http://copter.ardupilot.com/wiki/common-autopilots/common-apm25-and-26-overview/" target=_blank>APM 2.5 Overview</a></li>
+			<li><a href="http://www.arduino.cc/en/Reference/SoftwareSerial">Serial Library</a></li>	
+			<li><a href="http://www.arduino.cc/en/Reference/PinMode">Pin Mode</a></li>
+			<li><a href="http://www.arduino.cc/en/Reference/EEPROM">EEPROM</a></li>
+			<li><a href="https://learn.sparkfun.com/tutorials/installing-an-arduino-bootloader/connecting-the-programmer">ISP Connection</a></li>
+			<li><a href="http://www.arduino.cc/en/Hacking/Programmer">Burning Sketches to board</a></li>
+			<li><a href="http://www.arduino.cc/en/Tutorial/HomePage">Arduino Libraries</a></li>
+			<li><a href="https://github.com/greiman/FreeRTOS-Arduino/tree/master/libraries/FreeRTOS_AVR">FreeRTOS</a></li>
+			<li><a href="http://www.arduino.cc/en/Guide/Environment">Environment</a></li>
+			<li><a href="http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions.">Arduino Troubleshooting</a></li>
+			<li><a href="http://playground.arduino.cc/Interfacing/CPlusPlus">C++ Interface</a></li>
+			<li><a href="http://plane.ardupilot.com/wiki/arduplane-setup/connecting-your-rc-gear/">Wiring Guide</a></li>
+			
+		</ul>
+		<p></p>
+		
+		<h4><a href="http://copter.ardupilot.com/wiki/common-autopilots/common-apm25-and-26-overview/#A_Non_technical_Description_of_the_Power_Supply_Requirements">APM 2.5</a></h4>
+	
+		<ul>
+		
+			<li><a href=""></a></li>
+			<li><a href=""></a></li>	
+			<li><a href=""></a></li>
+			
+		</ul>
+		<p></p>
+		
+		<h4>Schematics</h4>
+	
+		<ul>
+		
+			<li><a href="https://lh3.googleusercontent.com/-kmzvGwFsvD8/UyIRKPC0edI/AAAAAAAADUA/na9K-3cHd2c/s1600/APM-ISP-Connection-Flash-Bootloader.png?width=700">ISP Connectors</a></li>
+			<li><a href=""></a></li>	
+			<li><a href=""></a></li>
+			
+		</ul>
+		<p></p>
+		
+		<h4>Arduino</h4>
+		<ul>
+	
+			<li><a href="http://www.arduino.cc/en/Guide/Environment">Environment</a></li>
+			<li><a href="http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions.">Troubleshooting</a></li>
+			<li><a href="http://playground.arduino.cc/Interfacing/CPlusPlus">C++ Interface</a></li>
+			<li><a href="https://www.arduino.cc/en/Guide/ArduinoISP">ISP</a></li>
+		
+		</ul>
+		
+		<h4>Python</h4>
+		<ul>
+	
+			<li><a href="http://qgroundcontrol.org/mavlink/pymavlink">PyMAVLink</a></li>
+			<li><a href="https://www.samba.org/tridge/UAV/pymavlink/apidocs/nameIndex.html">MAVLink Library</a></li>
+			<li><a href="https://www.samba.org/tridge/UAV/pymavlink/unpacked/examples/mavtest.py">Python Example</a></li>
+			<li><a href="http://qgroundcontrol.org/users/start#user_s_guide"target=_blank>Inside look at Mavlink py</a></li>
+		</ul>
+		
+		<h4>Software</h4>
+		<ul>
+			
+			<li><a href="http://gnuwin32.sourceforge.net/packages/make.htm">Make</a> : We compile using make</li>
+			<li><a href="http://mingw-w64.org/doku.php/download/mingw-builds">GNU Compiler</a></li>
+			<li><a href="http://sourceforge.net/projects/emacsbinw64/">Emacs</a> : For etags. Need etags to compile.</li>
+				
+			<li><a href="http://www.ultraedit.com/downloads.html">UltraEdit</a> : code editor. Other option is Notepad++... HA</li>
+			<li><a href="https://www.mythicsoft.com/agentransack/download">Agent Ransack</a> : search large directories</li>
+			
+		</ul>
+		
+		<h4>Bootloading</h4>
+		<ul>
+			
+			<li><a href="https://www.youtube.com/watch?v=4CMokvQBunQ">MinimOSD</a></li>
+			<li><a href=""></a></li>
+			<li><a href=""></a></li>
+			
+		</ul>
+		
+		<h4>Troubleshooting</h4>
+		<ul>
+			
+			<li><a href="http://forum.arduino.cc/index.php?topic=51819.0">Bootloading Tips</a></li>
+			<li><a href="http://arduino.stackexchange.com/questions/1673/using-arduinoisp-on-an-arduino-uno-to-program-an-atmega328">Bootloading</a></li>
+			<li><a href=""></a>check avrdude version</li>
+			<li><a href="http://www.arduino.cc/en/Guide/Troubleshooting">Arduino Troubleshooting</a></li>
+			
+		</ul>
+		
+		<h4>Bookmarks</h4>
+		<ul>
+			
+			<li><a href="http://tridge.github.io/MAVProxy/starting.html">MavProxy</a></li>
+			<li><a href="http://www.societyofrobots.com/bootloader_50_robot.shtml">Bootloading</a></li>
+			<li><a href=""></a></li>
+			
+		</ul>
+		
+		<h4>Advanced</h4>
+		<ul>
+			
+			<li><a href="http://www.researchgate.net/post/What_would_be_the_best_Closed-Loop_Control_technique_for_autonomous_stabilized_Quadrotor_Quadcopter">Forum about ways to control quad</a></li>
+			<li><a href="https://en.wikipedia.org/wiki/Sliding_mode_control">Slide Mode Control</a></li>
+			<li><a href=""></a></li>
+			
+		</ul>
+		
+		<h4>IDE's</h4>
+		<p>I use UltraEdit. If we wanted we could eventually set up an IDE. Takes time and I'm fine without it</p>
+		<ul>
+			
+			<li><a href="http://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/luna/SR1a/eclipse-cpp-luna-SR1a-win32-x86_64.zip&mirror_id=272">Eclipse IDE</a></li>
+			<li><a href="https://netbeans.org/community/releases/67/">NetBeans IDE</a></li>
+			<li><a href=""></a></li>
+			
+		</ul>
+		
+		<a href="http://www.w3schools.com/html/html_links.asp">HTML</a>
+		
+	</body>
+</html>

@@ -1,0 +1,9 @@
+TCK - A4 > B > Blue jumper   > 1
+TDO - A5 > R > Red jumper    > 3
+TMS - A6 > O > Orange jumper > 5
+
+TDI - A7 > G > Green jumper  > 9
+
+VCC - "-" on SPI pins > W > Red jumper  > 4
+GND - "s" on SPI pins > B > Blue jumper > 10
+RESET - "s" next to GND > jumper        > 6
