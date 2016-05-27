@@ -1,0 +1,41 @@
+avrdude -c dragon_isp -p m2560 -v -e 
+
+From the avr sparkfun example page it's for the atmega326
+-U efuse:w:0x05:m -U hfuse:w:0xD6:m -U lfuse:w:0xFF:m
+
+From calculator. Use this but check it first to the datasheet
+-U lfuse:w:0x42:m -U hfuse:w:0x99:m -U efuse:w:0xff:m
+
+Step 1
+Set fuse bits with above command
+
+Step 2
+Program
+
+
+
+
+pin 1 MISO
+pin 2 VIG
+pin 3 SCK
+pin 4 MOSI
+pin 5 RST
+pin 6 GND
+
+APM
+pin 2 S
+pin 4 +
+pin 6 -
+
+
+The default fuses were
+avrdude: safemode: lfuse reads as FF
+avrdude: safemode: hfuse reads as D8
+avrdude: safemode: efuse reads as FD
+
+I changed them to 
+avrdude: safemode: lfuse reads as 42
+avrdude: safemode: hfuse reads as 99
+avrdude: safemode: efuse reads as FF
+avrdude: safemode: Fuses OK (E:FF, H:99, L:42)
+
