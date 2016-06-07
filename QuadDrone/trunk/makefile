@@ -7,9 +7,10 @@ INC_DIRS = -I/usr/local/avr/lib/gcc/avr/5.2.0/include \
 DIS_INC = -nostdinc
 OUTPUT = main
 
-PROG = avrisp
+PROG = dragon_isp
 PORT = usb
-MCU = atmega2560
+MCU = m2560
+#MCU = atmega2560
 
 CC = avr-gcc
 CFLAGS = $(DIS_INC) $(INC_DIRS) -mcall-prologues -std=gnu99 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -mmcu=$(MCU) -Wall -Wstrict-prototypes -O2
