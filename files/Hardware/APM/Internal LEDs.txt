@@ -1,0 +1,8 @@
+APM 2.5
+
+Internal LEDs
+
+LED
+A: PA3 (Arduino pin 25)
+B: PA4 (Arduino pin 26)
+C: PA5 (Arduino pin 27)
