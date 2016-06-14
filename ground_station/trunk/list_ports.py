@@ -10,8 +10,8 @@ def cereal_ports():
         ports = ['COM' + str(i+1) for i in range(256)]
 
     #Linux platform system
-    elif sys.platform.startswith('linux')or sys.platform.startswith('cygwin'):
-        ports = glob.glob('dev/tty/[A-Za-z]*')
+    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        ports = glob.glob('/dev/tty[A-Za-z]*')
     #
     elif sys.platform.starswith('darwin'):
         ports = glob.glob('dev/tty.*')

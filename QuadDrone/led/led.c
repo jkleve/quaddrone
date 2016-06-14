@@ -1,7 +1,7 @@
 /*
  * led.c
  *
- * Created: 6/6/2016 6:51:07 PM
+ * Created: 6/6/2016
  *  Author: Jesse
  */ 
 

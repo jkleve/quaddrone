@@ -29,9 +29,9 @@ pin 5 RST
 pin 6 GND
 
 APM
-pin 2 S (GND)
+pin 6 S (GND)
 pin 4 + (MOSI
-pin 6 - (VCC)
+pin 2 - (VCC)
 
 
 The default fuses were
