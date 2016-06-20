@@ -11,6 +11,7 @@
 
 #include "led.h"
 
+// TODO don't use these
 void blink_a( void )
 {
   PORTA = 0b11110111;

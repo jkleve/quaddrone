@@ -4,6 +4,8 @@
 import sys
 import time
 import serial
+import thread
+import time
 from PyQt4 import QtGui,QtCore
 
 
@@ -65,9 +67,15 @@ class Widget(QtGui.QWidget):
                 #eventQKeyEvent.ignore()
 
 def write(window,com_port,val):
-    port = serial.Serial(com_port,38400,stopbits=1,timeout=5)
-    data  = port.write(hex(val))
+    send = serial.Serial(com_port,38400,stopbits=1,timeout=5)
+    data  = send.write(hex(val))
 
+def listen():
+    rec = serial.Serial('/dev/ttyUSB0', 38400, stopbits=1, timeout=5)
+
+    while True:
+        d = rec.read(1)
+        print "%s: %d" % ( time.ctime(time.time()), d)
 
 def main():
 
@@ -78,3 +86,14 @@ def main():
 
 if __name__ == '__main__':
     main()
+'''    try:
+        print "starting transmit thread ..."
+        thread.start_new_thread(main, ("Transmit"))
+        print "starting receive thread ..."
+        thread.start_new_thread(listen, ("Receive"))
+    except:
+        print "Error: unable to start thread"
+
+    while True:
+        pass
+'''

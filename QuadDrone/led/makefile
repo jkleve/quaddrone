@@ -72,7 +72,6 @@ size: $(OUTPUT).elf
 #Cleans all generated files
 clean:
 	rm -f $(OBJ_FILES)
-	12
-	m -f $(OUTPUT).elf
+	rm -f $(OUTPUT).elf
 	rm -f $(OUTPUT).hex
 	rm -f $(OUTPUT).map

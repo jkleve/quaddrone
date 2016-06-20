@@ -27,21 +27,18 @@ int main( void )
 {
   INIT_LEDS;
 
-  blink_c(); /* RED */
+  LED_ON(RED);
+  _delay_ms(5000);
+  LED_OFF(RED);
+
+  return 0;
+
+  BLINK(ORANGE);
 
   _delay_ms(1000);
 
   usart_comm_init();
-  triple_b();
-  _delay_ms(1000);
-
-  //comms_init(); TODO This does nothing but blink lights
-
-  A_ON;
-  _delay_ms(500);
 	sei();									  /* enable global interrupts */
-  A_OFF;
-  triple_b();
 
   /* PWM */
   DDRE = (1 << DDE3); // set PE3 as output
@@ -71,10 +68,9 @@ int main( void )
   TIMSK3 = (1 << TOIE3);
   OCR3A = (duty_cycle/100.0)*255;
 
-  C_ON;
-
   TCCR3B |= (0 << CS32) | (0 << CS31) | (1 << CS30); // set prescaler, starting clock
 
+  BLINK(RED); /* INITIALIZED */
 
   while (1)
   {
@@ -95,13 +91,13 @@ ISR( TIMER5_COMPA_vect )
 
 ISR( USART0_RX_vect )
 {
-  //blink_a();
-  //A_OFF;
-  _delay_ms(500);
-  duty_cycle = (int) UDR0;
-  OCR3A = (duty_cycle/100.0)*255; // TODO are we sure writing floats into OCR3A works?
+//  blink_b();
+  //duty_cycle = (int) UDR0;
+  //OCR3A = (int)((duty_cycle/100.0)*255); // TODO are we sure writing floats into OCR3A works?
                                   // TCNT increments by 1 so shouldn't it be an int?
-  put_char(duty_cycle);
+  int r = (int) UDR0;
+  put_char(r);
+  BLINK(BLUE);
   /*rxBuffer[rxWritePos] = UDR0;
 
   rxWritePos++;
