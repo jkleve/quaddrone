@@ -11,6 +11,7 @@
 SRC_FILES=\
 led.c
 #Object files
+PROCESS_FILES=$(SRC_FILES:.c=.e)
 OBJ_FILES=$(SRC_FILES:.c=.o)
 #Directories where to look for include files
 INC_DIRS=\
@@ -43,9 +44,11 @@ all: $(OUTPUT).elf
 #	@echo " BUILD FINISHED "																	\
 #	@echo "--------------------------------"									
 #Link output files
-$(OUTPUT).elf: $(OBJ_FILES)
+$(OUTPUT).elf: $(OBJ_FILES) $(PROCESS_FILES)
 	$(CC) $(CFLAGS) $(OBJ_FILES) -o $(OUTPUT).elf -Wl,-Map,$(OUTPUT).map
 #Create object files
+$(PROCESS_FILES): %.e : %.c
+	$(CC) -E $(CFLAGS) $< -o $@
 $(OBJ_FILES): %.o : %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 #Create assembler file of a C source
@@ -53,7 +56,7 @@ $(OBJ_FILES): %.o : %.c
 	$(CC) -S $(CFLAGS) $< -o $@
 #Loads the program to the avr device
 load:
-	avrdude -p $(MCU) -c $(PROG) -P $(PORT) -e -v -U flash:w:led.hex
+	avrdude -p $(MCU) -c $(PROG) -P $(PORT) -e -v -U flash:w:$(OUTPUT).hex
 #Program fuses
 fuses:
 	avrdude -p $(MCU) -c $(PROG) -P $(PORT) -v -e -U lfuse:w:0x42:m -U hfuse:w:0x99:m -U efuse:w:0xff:m
@@ -72,6 +75,7 @@ size: $(OUTPUT).elf
 #Cleans all generated files
 clean:
 	rm -f $(OBJ_FILES)
+	rm -f $(PROCESS_FILES)
 	rm -f $(OUTPUT).elf
 	rm -f $(OUTPUT).hex
 	rm -f $(OUTPUT).map

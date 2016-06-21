@@ -13,32 +13,40 @@
 #include "led.h"
 #include "comm.h"
 
-#define RX_BUFFER_SIZE 128
+//#define RX_BUFFER_SIZE 128
 
-char rxBuffer[RX_BUFFER_SIZE];
+/*char rxBuffer[RX_BUFFER_SIZE];
 uint8_t rxReadPos = 0;
 uint8_t rxWritePos = 0;
 
-char getChar(void);
+char getChar(void);*/
 
-int duty_cycle = 0; // TODO int or double ??
+int duty_cycle = 100; // TODO int or double ??
 
 int main( void )
 {
   INIT_LEDS;
 
-  LED_ON(RED);
-  _delay_ms(5000);
-  LED_OFF(RED);
+  //LED_ON(RED);
+  PORTA = 0x11;
+  _delay_ms(1000);
+  PORTA = 0x00;
+//  LED_OFF(RED);
+  while (1) {
+
+  }
 
   return 0;
 
-  BLINK(ORANGE);
+  //BLINK(ORANGE);
 
-  _delay_ms(1000);
+  //_delay_ms(1000);
 
   usart_comm_init();
 	sei();									  /* enable global interrupts */
+
+  blink_b();
+  _delay_ms(1000);
 
   /* PWM */
   DDRE = (1 << DDE3); // set PE3 as output
@@ -70,7 +78,8 @@ int main( void )
 
   TCCR3B |= (0 << CS32) | (0 << CS31) | (1 << CS30); // set prescaler, starting clock
 
-  BLINK(RED); /* INITIALIZED */
+  blink_a();
+  //BLINK(RED); /* INITIALIZED */
 
   while (1)
   {
@@ -96,8 +105,9 @@ ISR( USART0_RX_vect )
   //OCR3A = (int)((duty_cycle/100.0)*255); // TODO are we sure writing floats into OCR3A works?
                                   // TCNT increments by 1 so shouldn't it be an int?
   int r = (int) UDR0;
+  OCR3A = (int)((r/100.0)*255);
   put_char(r);
-  BLINK(BLUE);
+  //BLINK(BLUE);
   /*rxBuffer[rxWritePos] = UDR0;
 
   rxWritePos++;
@@ -108,7 +118,7 @@ ISR( USART0_RX_vect )
   }*/
 }
 
-char peekChar(void)
+/*char peekChar(void)
 {
   char ret = '\0';
 
@@ -137,4 +147,4 @@ char getChar(void)
   }
 
   return ret;
-}
+}*/

@@ -17,7 +17,7 @@ OBJ_FILES=$(SRC_FILES:.c=.o)
 INC_DIRS=\
 -I. \
 #Output file name
-OUTPUT=led
+OUTPUT=pwm
 #Programmer and port
 PROG=dragon_isp
 
@@ -56,7 +56,7 @@ $(OBJ_FILES): %.o : %.c
 	$(CC) -S $(CFLAGS) $< -o $@
 #Loads the program to the avr device
 load:
-	avrdude -p $(MCU) -c $(PROG) -P $(PORT) -e -v -U flash:w:led.hex
+	avrdude -p $(MCU) -c $(PROG) -P $(PORT) -e -v -U flash:w:$(OUTPUT).hex
 #Program fuses
 fuses:
 	avrdude -p $(MCU) -c $(PROG) -P $(PORT) -v -e -U lfuse:w:0x42:m -U hfuse:w:0x99:m -U efuse:w:0xff:m

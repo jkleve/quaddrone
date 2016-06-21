@@ -33,10 +33,10 @@
           LED_OFF(x);\
          }
 
-//void blink_a( void ); /* BLUE   */
-//void blink_b( void ); /* ORANGE */
-//void triple_b( void );
-//void blink_c( void ); /* RED    */
-//void comms_init( void );
+void blink_a( void ); /* BLUE   */
+void blink_b( void ); /* ORANGE */
+void triple_b( void );
+void blink_c( void ); /* RED    */
+void comms_init( void );
 
 #endif
