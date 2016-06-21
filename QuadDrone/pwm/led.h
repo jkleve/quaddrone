@@ -12,21 +12,17 @@
 # define LED_BLINK_DELAY 50
 
 
-# define INIT_LEDS (DDRA |= (1 << DDA3) | (1 << DDA4) | (1 << DDA5))
+# define INIT_LEDS {\
+          (DDRA |= (1 << DDA3) | (1 << DDA4) | (1 << DDA5)); \
+          (PORTA = 0xFF); \
+         }
 
-# define BLUE   PA5
-# define ORANGE PA4
-# define RED    PA3
+# define BLUE   0x08
+# define ORANGE 0x10
+# define RED    0x20
 
-# define A_ON  (PORTA |= (1 << PA5)) /* BLUE   */
-# define B_ON  (PORTA |= (1 << PA4)) /* ORANGE */
-# define C_ON  (PORTA |= (1 << PA3)) /* RED    */
-# define A_OFF (PORTA &= ~(1 << PA5))
-# define B_OFF (PORTA &= ~(1 << PA4))
-# define C_OFF (PORTA &= ~(1 << PA3))
-
-# define LED_ON(x)  (PORTA |= (1 << x))
-# define LED_OFF(x) (PORTA &= ~(1 << x))
+# define LED_ON(x)  (PORTA &= ~(x))
+# define LED_OFF(x) (PORTA |= (x))
 # define BLINK(x) { \
           LED_ON(x);\
           _delay_ms(LED_BLINK_DELAY);\

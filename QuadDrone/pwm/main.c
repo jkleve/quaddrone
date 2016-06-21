@@ -25,28 +25,13 @@ int duty_cycle = 100; // TODO int or double ??
 
 int main( void )
 {
-  INIT_LEDS;
+  INIT_LEDS
 
-  //LED_ON(RED);
-  PORTA = 0x11;
-  _delay_ms(1000);
-  PORTA = 0x00;
-//  LED_OFF(RED);
-  while (1) {
-
-  }
-
-  return 0;
-
-  //BLINK(ORANGE);
-
-  //_delay_ms(1000);
+  BLINK(ORANGE);
+  _delay_ms(500);
 
   usart_comm_init();
 	sei();									  /* enable global interrupts */
-
-  blink_b();
-  _delay_ms(1000);
 
   /* PWM */
   DDRE = (1 << DDE3); // set PE3 as output
@@ -78,13 +63,14 @@ int main( void )
 
   TCCR3B |= (0 << CS32) | (0 << CS31) | (1 << CS30); // set prescaler, starting clock
 
-  blink_a();
-  //BLINK(RED); /* INITIALIZED */
+  BLINK(RED); /* INITIALIZED */
 
   while (1)
   {
 
   }
+
+  return 0;
 }
 
 ISR(TIMER3_OVF_vect)
