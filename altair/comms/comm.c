@@ -22,10 +22,10 @@ void usart_comm_init( void )
 	UCSR0A |= (1 << U2X0);
 
   /* USART Control and Status Register B pg. 220  *
-   * enable RX Complete Interrupt Enable (RXCIE0) *
+   * ***disabled temporarily to try using RXCn.*** enable RX Complete Interrupt Enable (RXCIE0) *
    * enable Receiver Enable (RXEN0)               *
    * enable Transmitter Enable (TXEN0)            */
-	UCSR0B |= (1 << RXCIE0) | (0 << TXCIE0) | (0 << UDRIE0) | (1 << RXEN0) |
+	UCSR0B |= (0 << RXCIE0) | (0 << TXCIE0) | (0 << UDRIE0) | (1 << RXEN0) |
             (1 << TXEN0)  | (0 << UCSZ02) | (0 << TXB80);
 
 	/* USART Control and Status Register C  *

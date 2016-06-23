@@ -13,7 +13,7 @@
 #include "led.h"
 #include "comm.h"
 
-#define RX_BUFFER_SIZE 128
+//#define RX_BUFFER_SIZE 128
 
 struct data {
   int8_t roll;
@@ -21,58 +21,66 @@ struct data {
   int8_t yaw;
 } data_t;
 
-char rxBuffer[RX_BUFFER_SIZE];
+/*char rxBuffer[RX_BUFFER_SIZE];
 uint8_t rxReadPos = 0;
 uint8_t rxWritePos = 0;
 
-char getChar(void);
+char getChar(void);*/
 
-int main( void )
+volatile uint8_t rx = 0;
+volatile uint8_t tx = 0;
+volatile uint8_t can_tx = 0;
+volatile uint8_t received = 0;
+//volatile char transmit = 0;
+
+int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking statment
+// before you start reading, start a timer, read the bytes, stop the timer, send the time back or 
+// write to EEPROM. i want to see if thats feasible to read them all in a row
 {
   INIT_LEDS;
 
-  BLINK(RED);
-
-  _delay_ms(1000);
-
   usart_comm_init();
 
-  _delay_ms(1000);
-
-  //comms_init(); TODO This does nothing but blink lights
-
 	sei();									  /* enable global interrupts */
-	//init_pulse();
-  LED_ON(BLUE);
+
+  LED_ON(ORANGE);
+  _delay_ms(1000);
+  LED_OFF(ORANGE);
 
   while (1)
   {
-  }
-}
+    if ( (UCSR0A & (1<<UDRE0)) ) can_tx = 1; // tx buffer empty
 
-ISR( TIMER5_COMPA_vect )
-{
-  //blink_a();
-	//put_char(ROGER);
+    if ( (UCSR0A & (1<<RXC0)) ) rx = 1; // rx buffer has data
+    
+    if (rx) // read data received
+    {
+      received = (uint8_t) UDR0;
+      rx = 0;
+
+      //transmit = received;
+      tx = 1;
+    }
+
+    if (tx && can_tx) // send data
+    {
+      UDR0 = received;
+      //UDR0 = 42;
+      can_tx = 0;
+      tx = 0;
+    }
+
+
+  }
 }
 
 ISR( USART0_RX_vect )
 {
-  //blink_a();
-  //A_OFF;
-  //_delay_ms(500);
-//  char i = (char) UDR0;
-  put_char(UDR0);
-  /*rxBuffer[rxWritePos] = UDR0;
-
-  rxWritePos++;
-
-  if (rxWritePos >= RX_BUFFER_SIZE)
-  {
-    rxWritePos = 0;
-  }*/
+  LED_ON(BLUE);
+  _delay_ms(5000);
+  LED_OFF(BLUE);
 }
-
+/*
 char peekChar(void)
 {
   char ret = '\0';
@@ -102,4 +110,4 @@ char getChar(void)
   }
 
   return ret;
-}
+}*/
