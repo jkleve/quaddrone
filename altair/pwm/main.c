@@ -38,8 +38,8 @@ int main( void )
   //PORTE = (1 << PE3) // enable pull-up resistor
 
   /* 
-   * Fast PWM, 8-bit: Mode 5 pg. 145
-   *  WGM33:0 0b0101
+   * Fast PWM, 8-bit: Mode 14 pg. 145
+   *  WGM33:0 0b1110
    * Compare Output Mode: Clear OC3Aon compare, set at BOTTOM pg. 155
    *  COM3A1:0 0b10
     */
@@ -48,20 +48,21 @@ int main( void )
   TCCR3A = (1 << COM3A1) | (0 << COM3A0) |
            (0 << COM3B1) | (0 << COM3B0) |
            (0 << COM3C1) | (0 << COM3C0) |
-           (0 << WGM31)  | (0 << WGM31);
+           (1 << WGM31)  | (0 << WGM30);
 
   /* Timer/Counter 3 Control Register B 
    *  No prescaler on clock pg. 157
    *   CS32:0 0b001                       */
   TCCR3B =  (0 << ICNC1) | (0 << ICES1) |
-            (0 << WGM33) | (1 << WGM32);
+            (1 << WGM33) | (1 << WGM32);
   /* Timer/Counter 3 Interrupt Mask Register
    *  enable Timer/Counter, Overflow Interrupt pg. 162
    *   TOIE3 0b1 */
   TIMSK3 = (1 << TOIE3);
-  OCR3A = (duty_cycle/100.0)*255;
+  ICR3 = 19999;
+  OCR3A = (duty_cycle/100.0)*255; // TODO needs to be 5 - 10 %
 
-  TCCR3B |= (0 << CS32) | (0 << CS31) | (1 << CS30); // set prescaler, starting clock
+  TCCR3B |= (0 << CS32) | (1 << CS31) | (0 << CS30); // set prescaler clk/8 0b010 pg. 157, starting clock
 
   BLINK(RED); /* INITIALIZED */
 

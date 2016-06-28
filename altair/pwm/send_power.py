@@ -4,13 +4,19 @@
 import sys
 import time
 import serial
-import thread
+import struct
+#import thread
 import time
+from threading import Thread
 from PyQt4 import QtGui,QtCore
 
 
-com_port = '/dev/ttyUSB0' #Choose whatever comport to be used for serial
-#port = serial.Serial('/dev/ttyUSB0', 38400, stopbits=1, timeout=5)
+port = serial.Serial(port='/dev/ttyUSB0', 
+                     baudrate=38400,
+                     bytesize=serial.EIGHTBITS,
+                     parity=serial.PARITY_NONE,
+                     stopbits=serial.STOPBITS_ONE, 
+                     timeout=2)
 power = 0
 
 class Widget(QtGui.QWidget):
@@ -46,36 +52,37 @@ class Widget(QtGui.QWidget):
                 power += 1
                 power = min(power, 100)
                 window.progress_bar_t.setValue(power)
-                write(window,com_port,power)
+                write(window, power)
         elif key == 83:# s
                 power -= 1
                 power = max(power, 0)
                 window.progress_bar_t.setValue(power)
-                write(window,com_port,power)
+                write(window, power)
         elif key == 85:# u
                 power = 100
                 window.progress_bar_t.setValue(power)
-                write(window,com_port,power)
+                write(window, power)
         elif key == 32:# space
                 power = 0
                 window.progress_bar_t.setValue(power)
-                write(window,com_port,power)
+                write(window, power)
         else:
                 power = 0
                 window.progress_bar_t.setValue(power)
-                write(window,com_port,power)
+                write(window, power)
                 #eventQKeyEvent.ignore()
 
-def write(window,com_port,val):
-    send = serial.Serial(com_port,38400,stopbits=1,timeout=5)
-    data  = send.write(hex(val))
+def write(window, val):
+#    send = serial.Serial(com_port,38400,stopbits=1,timeout=5)
+    data = port.write(struct.pack("b", val))
 
 def listen():
-    rec = serial.Serial('/dev/ttyUSB0', 38400, stopbits=1, timeout=5)
+    #rec = serial.Serial('/dev/ttyUSB0', 38400, stopbits=1, timeout=5)
 
     while True:
-        d = rec.read(1)
-        print "%s: %d" % ( time.ctime(time.time()), d)
+        d = port.read(1)
+        #if struct.unpack("b", 
+        print "%s: %s" % ( time.ctime(time.time()), d)
 
 def main():
 
@@ -85,7 +92,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    Thread(target=main).start()
+    Thread(target=listen).start()
+#    main()
 '''    try:
         print "starting transmit thread ..."
         thread.start_new_thread(main, ("Transmit"))
