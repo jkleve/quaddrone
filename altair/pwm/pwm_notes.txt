@@ -1,0 +1,3 @@
+0 - 19,999 (20,000 ticks)
+18,999 (19,000 ticks): 0% from ground station
+17,999 (18,000 ticks): 100% from ground station
