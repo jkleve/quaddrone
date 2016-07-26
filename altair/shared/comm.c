@@ -9,6 +9,8 @@
 #include "clock_speed.h"
 #include "comm.h"
 
+//#define (MYUBRR F_CPU/16/USART_BAUD-1) //TODO added. pg. 206
+
 void usart_comm_init( void )
 {	
 	/* Asynchronous USART (UMSEL01 & UMSEL00 = 0)				  *
@@ -37,6 +39,8 @@ void usart_comm_init( void )
   /* USART Baud Rate Register pg. 222 *
    * see pg. 203 for the formula      */
 	UBRR0 = F_CPU / (8 * USART_BAUD) - 1;
+ // UBRRH = (unsigned char)(MYUBRR>>8);
+ // UBRRL = (unsigned char)(MYUBRR);
 }
 
 /* must have global interrupts enabled */

@@ -21,21 +21,22 @@ uint8_t rxWritePos = 0;
 
 char getChar(void);*/
 
-int duty_cycle = 100; // TODO int or double ??
+/* comms */
+volatile uint8_t rx = 0;
+volatile uint8_t tx = 0;
+volatile uint8_t can_tx = 0;
+volatile uint8_t received = 0;
+volatile int8_t motor_val = 0;
 
 int main( void )
 {
-  INIT_LEDS
-
-  BLINK(ORANGE);
-  _delay_ms(500);
+  INIT_LEDS;
 
   usart_comm_init();
 	sei();									  /* enable global interrupts */
 
   /* PWM */
   DDRE = (1 << DDE3); // set PE3 as output
-  //PORTE = (1 << PE3) // enable pull-up resistor
 
   /* 
    * Fast PWM, 8-bit: Mode 14 pg. 145
@@ -59,8 +60,9 @@ int main( void )
    *  enable Timer/Counter, Overflow Interrupt pg. 162
    *   TOIE3 0b1 */
   TIMSK3 = (1 << TOIE3);
-  ICR3 = 19999;
-  OCR3A = (duty_cycle/100.0)*255; // TODO needs to be 5 - 10 %
+  ICR3 = 19999; // 50 Hz
+  //OCR3A = 17999; // 100 %
+  OCR3A = 1999; // 100% ?? (note: not 100% sure on that)
 
   TCCR3B |= (0 << CS32) | (1 << CS31) | (0 << CS30); // set prescaler clk/8 0b010 pg. 157, starting clock
 
@@ -68,7 +70,33 @@ int main( void )
 
   while (1)
   {
+    if ( (UCSR0A & (1<<UDRE0)) ) can_tx = 1; // tx buffer empty
 
+    if ( (UCSR0A & (1<<RXC0)) ) rx = 1; // rx buffer has data
+    
+    if (rx) // read data received
+    {
+      if (UCSR0A & (1<<FE0)) BLINK(BLUE); // added to show errors
+      if (UCSR0A & (1<<DOR0)) BLINK(ORANGE); // added to show overrun errors
+      received = (int8_t) UDR0;
+      rx = 0;
+      tx = 1;
+
+      /* update pwm */
+      motor_val = -1*(received+1)*4;
+      OCR3A = 1200 + (motor_val*10);
+      //OCR3A = 18999 - (received*10);
+    }
+
+    if (tx && can_tx) // send data
+    {
+      //UDR0 = (received>>8);
+      //while ( !(UCSR0A & (1<<TXC0)) ); // TODO changed
+      UDR0 = (motor_val/-4)-1;
+//      UDR0 = 0b00000001;
+      can_tx = 0;
+      tx = 0;
+    }
   }
 
   return 0;
@@ -92,6 +120,8 @@ ISR( USART0_RX_vect )
   //OCR3A = (int)((duty_cycle/100.0)*255); // TODO are we sure writing floats into OCR3A works?
                                   // TCNT increments by 1 so shouldn't it be an int?
   int r = (int) UDR0;
+  LED_ON(RED);
+  _delay_ms(10000);
   //OCR3A = (int)((r/100.0)*255);
   put_char(r);
   //BLINK(BLUE);

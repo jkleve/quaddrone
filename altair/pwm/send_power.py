@@ -5,13 +5,13 @@ import sys
 import time
 import serial
 import struct
-#import thread
 import time
+from ctypes import *
 from threading import Thread
 from PyQt4 import QtGui,QtCore
 
 
-port = serial.Serial(port='/dev/ttyUSB0', 
+port = serial.Serial(port='/dev/ttyUSB2', 
                      baudrate=38400,
                      bytesize=serial.EIGHTBITS,
                      parity=serial.PARITY_NONE,
@@ -50,39 +50,41 @@ class Widget(QtGui.QWidget):
         key = eventQKeyEvent.key()
         if key == 87:# w
                 power += 1
-                power = min(power, 100)
-                window.progress_bar_t.setValue(power)
+                power = min(power, 25) # limiting to 25 for UART issue
+                print
+                window.progress_bar_t.setValue(power*4)
                 write(window, power)
         elif key == 83:# s
                 power -= 1
                 power = max(power, 0)
-                window.progress_bar_t.setValue(power)
+                window.progress_bar_t.setValue(power*4)
                 write(window, power)
         elif key == 85:# u
                 power = 100
-                window.progress_bar_t.setValue(power)
+                window.progress_bar_t.setValue(power*4)
                 write(window, power)
         elif key == 32:# space
                 power = 0
-                window.progress_bar_t.setValue(power)
+                window.progress_bar_t.setValue(power*4)
                 write(window, power)
         else:
                 power = 0
-                window.progress_bar_t.setValue(power)
+                window.progress_bar_t.setValue(power*4)
                 write(window, power)
                 #eventQKeyEvent.ignore()
 
 def write(window, val):
-#    send = serial.Serial(com_port,38400,stopbits=1,timeout=5)
-    data = port.write(struct.pack("b", val))
+    data = port.write(struct.pack('b', -1*val-1))
+    #print "%d bytes written" % data
 
 def listen():
     #rec = serial.Serial('/dev/ttyUSB0', 38400, stopbits=1, timeout=5)
 
     while True:
         d = port.read(1)
-        #if struct.unpack("b", 
-        print "%s: %s" % ( time.ctime(time.time()), d)
+        if len(d) > 0:
+            v = struct.unpack('b', d)[0]
+            print "%s: %d -> %d" % ( time.ctime(time.time()), v, -1*(v+1)*4 )
 
 def main():
 
@@ -94,15 +96,3 @@ def main():
 if __name__ == '__main__':
     Thread(target=main).start()
     Thread(target=listen).start()
-#    main()
-'''    try:
-        print "starting transmit thread ..."
-        thread.start_new_thread(main, ("Transmit"))
-        print "starting receive thread ..."
-        thread.start_new_thread(listen, ("Receive"))
-    except:
-        print "Error: unable to start thread"
-
-    while True:
-        pass
-'''
