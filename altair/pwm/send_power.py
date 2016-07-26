@@ -78,8 +78,6 @@ def write(window, val):
     #print "%d bytes written" % data
 
 def listen():
-    #rec = serial.Serial('/dev/ttyUSB0', 38400, stopbits=1, timeout=5)
-
     while True:
         d = port.read(1)
         if len(d) > 0:
