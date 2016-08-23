@@ -11,7 +11,7 @@ from threading import Thread
 from PyQt4 import QtGui,QtCore
 
 
-port = serial.Serial(port='/dev/ttyUSB2', 
+port = serial.Serial(port='/dev/ttyUSB0', 
                      baudrate=38400,
                      bytesize=serial.EIGHTBITS,
                      parity=serial.PARITY_NONE,

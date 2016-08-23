@@ -1,6 +1,0 @@
-start timer/counter 5
-initialize radio
-wait for go ahead message
-send 0x31
-initialize heartbeat
-initialize 
