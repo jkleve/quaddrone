@@ -14,6 +14,9 @@
 #include "comm.h"
 #include "twi_master.h"
 
+#define T_SAMPLE 10
+const int T_CNT = T_SAMPLE * 1000L/64.0;	// Number count temp2.  1 Count Temp1 64us => T_sample = Value_CNT1 = ms/64us
+
 //#define RX_BUFFER_SIZE 128
 
 struct data {
@@ -66,7 +69,12 @@ int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking stat
       matrix_update(t_sample, gyro);          // Send t_sample and command yaw for DCM matrix
       normalize();
       drift_correction();                  
-      t_control++;  
+      t_control++;
+      // TODO send imu values to gs
+      // try connecting apm to laptop/gs via usb to narrow down issue
+      // can test imu program without usart if usb works
+    }
+
     if ( (UCSR0A & (1<<UDRE0)) ) can_tx = 1; // tx buffer empty
 
     if ( (UCSR0A & (1<<RXC0)) ) rx = 1; // rx buffer has data
