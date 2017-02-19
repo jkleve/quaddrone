@@ -1,6 +1,13 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Useful Sites ###
+
+* [APM 2.6 Board](http://ardupilot.org/copter/docs/common-apm25-and-26-overview.html)
+* [Atmega 2560 Datasheet](http://www.atmel.com/devices/atmega2560.aspx)
+
+* [AVR Libc Reference Manual](http://www.atmel.com/webdoc/avrlibcreferencemanual/index.html)
+* [AVR Fuse Calculator](http://www.engbedded.com/fusecalc/)
+* [Timer Calculator](http://eleccelerator.com/avr-timer-calculator/)
 
 ### What is this repository for? ###
 
@@ -28,11 +35,3 @@ This README would normally document whatever steps are necessary to get your app
 * Repo owner or admin
 * Other community or team contact
 
-### Useful Sites ###
-
-* [APM 2.6 Board](http://ardupilot.org/copter/docs/common-apm25-and-26-overview.html)
-* [Atmega 2560 Datasheet](http://www.atmel.com/devices/atmega2560.aspx)
-
-* [AVR Libc Reference Manual](http://www.atmel.com/webdoc/avrlibcreferencemanual/index.html)
-* [AVR Fuse Calculator](http://www.engbedded.com/fusecalc/)
-* [Timer Calculator](http://eleccelerator.com/avr-timer-calculator/)
