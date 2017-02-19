@@ -45,3 +45,6 @@
 
 * If you have questions: jesse.kleve@gmail.com
 
+### Thanks to ###
+* [mkleemann for cmake-avr](https://github.com/mkleemann/cmake-avr)
+
