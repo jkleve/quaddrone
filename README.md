@@ -19,6 +19,11 @@
 * [Power Distribution Board](https://hobbyking.com/en_us/hobby-king-quadcopter-power-distribution-board.html)
 * [Telemetry Radio Set](https://store.3dr.com/products/915-mhz-telemetry-radio)
 
+### External Libraries for Help ###
+* [UART](https://github.com/andygock/avr-uart)
+* [Quadcopter-Homemade](https://github.com/julome/Quadcopter-Homemade)
+* [i2cdevlib](https://www.i2cdevlib.com/devices/mpu6050#source)
+
 ### What is this repository for? ###
 
 * Quick summary
