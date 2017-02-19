@@ -18,6 +18,7 @@
 * [Zippy Flightmax 2650mAh 3S1P 40C Battery](https://hobbyking.com/en_us/zippy-flightmax-2650mah-3s1p-40c.html)
 * [Power Distribution Board](https://hobbyking.com/en_us/hobby-king-quadcopter-power-distribution-board.html)
 * [Telemetry Radio Set](https://store.3dr.com/products/915-mhz-telemetry-radio)
+* AVR Dragon Programmer
 
 ### External Libraries for Help ###
 * [UART](https://github.com/andygock/avr-uart)
