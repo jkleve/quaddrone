@@ -12,6 +12,7 @@ namespace Quad {
     };
 
     enum State {
+        Shutdown,
         MainProcessesing,
         ReceivedMsg,
         CanTx,
@@ -32,9 +33,6 @@ namespace Quad {
         private:
             QuadState();
             bool tenHzTimerExpired;
-            bool shutdown;
-            bool can_tx;
-            bool rx;
             bool states[NumStates];
     };
 

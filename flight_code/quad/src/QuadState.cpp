@@ -13,20 +13,24 @@ Quad::QuadState::QuadState() :
     tenHzTimerExpired( false )
 {
 
+    states[Shutdown] = false;
+    states[MainProcessesing] = false;
+    states[ReceivedMsg] = false;
+    states[CanTx] = false;
 }
 
 bool Quad::QuadState::abort(void) {
-    return shutdown;
+    return states[Shutdown];
 }
 
 bool Quad::QuadState::canTx()
 {
-    return can_tx;
+    return states[CanTx];
 }
 
 bool Quad::QuadState::received()
 {
-    return rx;
+    return states[ReceivedMsg];
 }
 
 Quad::QuadState &Quad::QuadState::reference() {

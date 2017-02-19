@@ -47,6 +47,7 @@ void Quad::QuadMgr::loop() {
 
         if( quadState.abort() )
         {
+            // de-init
             break;
         }
     } while (true);
