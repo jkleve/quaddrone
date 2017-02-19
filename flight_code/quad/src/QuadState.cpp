@@ -34,15 +34,14 @@ Quad::QuadState &Quad::QuadState::reference() {
     return ref;
 }
 
-void Quad::QuadState::set(Quad::State state) {
+void Quad::QuadState::set( Quad::State state ) {
     states[state] = true;
 }
 
-void Quad::QuadState::unset(Quad::State state) {
+void Quad::QuadState::unset( Quad::State state ) {
     states[state] = false;
 }
 
-bool Quad::QuadState::getstate(Quad::State state) {
+bool Quad::QuadState::getstate( Quad::State state ) {
     return states[state];
 }
-

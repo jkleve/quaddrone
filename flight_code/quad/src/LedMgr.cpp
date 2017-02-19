@@ -20,7 +20,7 @@ LED::LedMgr &LED::LedMgr::reference( void ) {
     return ref;
 }
 
-void LED::LedMgr::toggle(LED light) {
+void LED::LedMgr::toggle( LED light ) {
     switch( light )
     {
         case BLUE:
@@ -36,4 +36,3 @@ void LED::LedMgr::toggle(LED light) {
             break;
     }
 }
-
