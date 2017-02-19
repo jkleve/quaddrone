@@ -54,9 +54,9 @@ Quad::InterruptMgr &Quad::InterruptMgr::reference( void ) {
 
 void Quad::InterruptMgr::initMainTimer( void )
 {
-    TCCR0A |= (0 << WGM31)  | (0 << WGM30)  | // normal mode 0
+    TCCR0A |= (0 << WGM01)  | (0 << WGM00)  | // normal mode 0
               (0 << COM0A1) | (0 << COM0A0) | // disable compare on match A
               (0 << COM0B1) | (0 << COM0B0);  // disable compare on match B
     TCCR0B =  (1 << CS02) | (0 << CS01) | (1 << CS00) | // clock select 5 (clk / 1024). clock select starts time
-              (0 << WGM32); // normal mode 0
+              (0 << WGM02); // normal mode 0
 }
