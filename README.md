@@ -24,6 +24,7 @@
 ### Fuses ###
 
 * Table 30-4. Fuse High Byte [1]
+
 | Fuse High Byte | Bit No | Description                                   | Default Value                  | Value Used |
 |----------------|--------|-----------------------------------------------|--------------------------------|------------|
 | OCDEN          | 7      | Enable OCD                                    | 1 (unprogrammed, OCD disabled) | 1          |
@@ -37,6 +38,7 @@
 |                |        |                                               | 0x99                           | 0x99       |
 
 * Table 30-5. Fuse Low Byte [1]
+
 | Fuse Low Byte | Bit No | Description                                   | Default Value                  | Value Used |
 |---------------|--------|-----------------------------------------------|--------------------------------|------------|
 | CKDIV8        | 7      | Divide clock by 8                             | 0 (programmed)                 | 1          |
