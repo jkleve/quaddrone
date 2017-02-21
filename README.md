@@ -5,7 +5,8 @@
 * [APM 2.6 Board](http://ardupilot.org/copter/docs/common-apm25-and-26-overview.html)
 * [Atmega 2560 Datasheet](http://www.atmel.com/devices/atmega2560.aspx)
 
-* [AVR Libc Reference Manual](http://www.atmel.com/webdoc/avrlibcreferencemanual/index.html)
+* [AVR Libc Manual](http://www.nongnu.org/avr-libc/user-manual/index.html)
+* [Atmel's AVR Libc Reference Manual](http://www.atmel.com/webdoc/avrlibcreferencemanual/index.html)
 * [All You Need to Know About AVR Fuses](http://www.embedds.com/all-you-need-to-know-about-avr-fuses/)
 * [AVR Fuse Calculator](http://www.engbedded.com/fusecalc/)
 * [Timer Calculator](http://eleccelerator.com/avr-timer-calculator/)
