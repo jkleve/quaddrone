@@ -28,7 +28,7 @@ set(AVR_UPLOADTOOL_PORT usb)
 ##########################################################################
 set(AVR_MCU atmega2560)
 set(AVR_H_FUSE 0x99)
-set(AVR_L_FUSE 0xC2)
+set(AVR_L_FUSE 0xE2)
 
 ### END TOOLCHAIN SETUP AREA #############################################
 
@@ -127,6 +127,7 @@ add_definitions("-funsigned-char")
 add_definitions("-funsigned-bitfields")
 add_definitions("-ffunction-sections")
 add_definitions("-c")
+add_definitions("-O2")
 add_definitions("-std=c++11") # added for singleton support in the way i've done it
 add_definitions("-fno-threadsafe-statics") # added because for some reason ?
 # wow I was bad with documenting my reasons for change here
