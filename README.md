@@ -14,7 +14,7 @@
 
 * APM 2.6 Flight Controller
 * [4-Axis HJ450 Multi Flame Wheel Quadcopter Kit](http://www.dx.com/p/4-axis-hj450-multi-flame-wheel-flame-strong-smooth-kk-mk-mwc-quadcopter-kit-red-black-124486#.VPTJPPnF9-Q)
-* [Turnigy Basic 18A v3.1 ESC](https://hobbyking.com/en_us/turnigy-multistar-10a-v2-esc-with-blheli-and-2a-lbec-2-3s-v.html)
+* [Turnigy Basic 18A v3.1 ESC](https://hobbyking.com/en_us/turnigy-basic-18a-v3-1-speed-controller.html)
 * [NTM Prop Drive 28-26 1000kV/235W Motor](https://hobbyking.com/en_us/ntm-prop-drive-28-26-1000kv-235w.html)
 * [Zippy Flightmax 2650mAh 3S1P 40C Battery](https://hobbyking.com/en_us/zippy-flightmax-2650mah-3s1p-40c.html)
 * [Power Distribution Board](https://hobbyking.com/en_us/hobby-king-quadcopter-power-distribution-board.html)
