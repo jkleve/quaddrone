@@ -55,9 +55,10 @@ lfuse
 ** This is with CKDIV8 programmed
 *** This divides the clock by 8 so the clock speed will be 1 MHz
 * 42: SUT1:0 0b00 (0 ms delay before clock is "stable")
-* 52: SUT1:0 0b10 (4.1 ms delay)
-* 62: SUT1:0 0b01 (65 ms delay)
+* 52: SUT1:0 0b01 (4.1 ms delay)
+* 62: SUT1:0 0b10 (65 ms delay)
 * NOTE: I've now switched to 0xC2 instead of 0x42. The C gives 8Mhz instead of 1Mhz
+*     updated to 0xE2. Not sure if the 64 ms delay helps at all but switched to default value
 
 hfuse
 * BOOTRST: 1
