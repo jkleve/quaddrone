@@ -3,7 +3,7 @@
 //
 
 extern "C" {
-#include <util/delay.h>
+#include <avr/io.h> // TODO remove when done
 }
 
 #include "QuadMgr.h"
@@ -12,7 +12,8 @@ Quad::QuadMgr::QuadMgr() :
     ledMgr( LED::LedMgr::reference() ),
     commsMgr( Comms::CommsMgr::reference() ),
     quadState( Quad::QuadState::reference() ),
-    interruptMgr( Quad::InterruptMgr::reference() )
+    interruptMgr( Quad::InterruptMgr::reference() ),
+    eepromMgr( Eeprom::EepromMgr::reference() )
 {
 
 }
@@ -30,19 +31,24 @@ void Quad::QuadMgr::loop() {
         interruptMgr.pollInterupts();
 
         // Processesing to be done at 20Hz.
+        // TODO add error for if we are taking too long
         if( quadState.getstate( MainProcessesing ) )
         {
-            // main processesing
-            ledMgr.toggle( LED::RED );
+            // need to move stuff here after debugging
+            if( quadState.received() )
+            {
+                uint8_t d = commsMgr.getChar();
+                commsMgr.putChar(d);
+                quadState.unset( State::ReceivedMsg );
+            }
 
             quadState.unset(MainProcessesing);
         }
 
-        // move this to 10 - 20 Hz processing
-        if( quadState.received() )
+        if( quadState.getstate( OneHzTimer ) )
         {
-            // TODO add a buffer and receive a "frame" or "packet"
-            //uint8_t data = commsMgr.getChar();
+            ledMgr.toggle( LED::RED );
+            quadState.unset(OneHzTimer);
         }
 
         if( quadState.abort() )

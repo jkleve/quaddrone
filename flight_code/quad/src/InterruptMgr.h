@@ -7,6 +7,10 @@
 
 #include <stdint.h>
 #include "QuadState.h"
+#include "Timer0.h"
+#include "Timer1.h"
+#include "LedMgr.h"
+#include "Eeprom.h"
 
 namespace Quad {
     class InterruptMgr {
@@ -17,10 +21,10 @@ namespace Quad {
             InterruptMgr();
             void initMainTimer();
             QuadState& quadState;
-            volatile uint8_t mainTimer;
-            volatile uint8_t mainTimerInterruptReg;
-            const uint8_t MAIN_TIMER_OVERFLOW;
-            const uint8_t MAIN_TIMER_THRESHOLD;
+            Timer0& timer0;
+            Timer1& timer1;
+            LED::LedMgr& ledMgr;
+            Eeprom::EepromMgr& eepromMgr;
     };
 }
 

@@ -48,6 +48,12 @@ Comms::CommsMgr &Comms::CommsMgr::reference() {
 }
 
 uint8_t Comms::CommsMgr::getChar(void) {
-    return 0;
+    uint8_t byte = (uint8_t) UDR0;
+    return byte;
 }
+
+Comms::Frame Comms::CommsMgr::getFrame(void) {
+    return Comms::Frame();
+}
+
 

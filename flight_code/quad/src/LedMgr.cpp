@@ -20,7 +20,8 @@ LED::LedMgr &LED::LedMgr::reference( void ) {
     return ref;
 }
 
-void LED::LedMgr::toggle( LED light ) {
+void LED::LedMgr::toggle( LED light )
+{
     switch( light )
     {
         case BLUE:
@@ -31,6 +32,42 @@ void LED::LedMgr::toggle( LED light ) {
             break;
         case RED:
             PORTA ^= 0x20;
+            break;
+        default:
+            break;
+    }
+}
+
+void LED::LedMgr::on( LED light )
+{
+    switch( light )
+    {
+        case BLUE:
+            PORTA |= 0x08;
+            break;
+        case YELLOW:
+            PORTA |= 0x10;
+            break;
+        case RED:
+            PORTA |= 0x20;
+            break;
+        default:
+            break;
+    }
+}
+
+void LED::LedMgr::off( LED light )
+{
+    switch( light )
+    {
+        case BLUE:
+            PORTA &= ~0x08;
+            break;
+        case YELLOW:
+            PORTA &= ~0x10;
+            break;
+        case RED:
+            PORTA &= ~0x20;
             break;
         default:
             break;

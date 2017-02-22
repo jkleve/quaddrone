@@ -18,6 +18,8 @@ namespace LED {
         public:
             static LedMgr& reference();
             void toggle(LED);
+            void on(LED);
+            void off(LED);
         private:
             LedMgr();
     };

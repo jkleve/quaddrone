@@ -11,6 +11,8 @@ add_avr_executable(
    InterruptMgr.cpp
    LedMgr.cpp
    Register.cpp
+   Timer1.cpp
+   Timer0.cpp
    )
 
 #####################################################################

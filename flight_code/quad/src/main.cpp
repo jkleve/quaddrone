@@ -96,7 +96,7 @@ int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking stat
 // write to EEPROM. i want to see if thats feasible to read them all in a row
 {
     // Initialize
-    sei();
+    //sei();
     Quad::QuadMgr quadMgr;
 
     // Process loop

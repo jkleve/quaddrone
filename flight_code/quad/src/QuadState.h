@@ -14,6 +14,7 @@ namespace Quad {
     enum State {
         Shutdown,
         MainProcessesing,
+        OneHzTimer,
         ReceivedMsg,
         CanTx,
         NumStates

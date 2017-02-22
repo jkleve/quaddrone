@@ -5,13 +5,17 @@
 #ifndef COMMS_EEPROM_H
 #define COMMS_EEPROM_H
 
+#include <stdint.h>
+
 namespace Eeprom {
     class EepromMgr {
-        EepromMgr();
-
-        ~EepromMgr();
-
-        void write(char *d);
+        public:
+            static EepromMgr& reference();
+            void write(uint8_t);
+        private:
+            EepromMgr();
+            uint8_t writeAddress;
+            uint8_t writeData;
     };
 }
 

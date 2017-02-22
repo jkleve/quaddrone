@@ -24,6 +24,7 @@ namespace Quad {
             Comms::CommsMgr& commsMgr;
             QuadState& quadState;
             InterruptMgr& interruptMgr;
+            Eeprom::EepromMgr& eepromMgr;
 
             void loop();
     };
