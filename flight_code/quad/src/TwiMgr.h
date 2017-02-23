@@ -13,11 +13,11 @@ namespace Twi {
     class TwiMgr {
         public:
             static TwiMgr& reference();
+            bool writeBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data);
+            bool writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data);
         private:
             TwiMgr();
 
-            bool writeBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint8_t length, uint8_t data);
-            bool writeBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t data);
             int8_t readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, uint16_t timeout);
             bool writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data);
             bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data);

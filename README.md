@@ -57,6 +57,7 @@
 * [UART](https://github.com/andygock/avr-uart)
 * [Quadcopter-Homemade](https://github.com/julome/Quadcopter-Homemade)
 * [i2cdevlib](https://www.i2cdevlib.com/devices/mpu6050#source)
+* [i2cdevlib Github](https://github.com/jrowberg/i2cdevlib)
 
 ### What is this repository for? ###
 
