@@ -8,11 +8,14 @@ add_avr_executable(
    Eeprom.cpp
    QuadState.cpp
    QuadMgr.cpp
+   QuadParams.cpp
    InterruptMgr.cpp
    LedMgr.cpp
    Register.cpp
    Timer1.cpp
    Timer0.cpp
+   TwiMgr.cpp
+   ImuMgr.cpp
    )
 
 #####################################################################

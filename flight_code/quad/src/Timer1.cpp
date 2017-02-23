@@ -6,15 +6,11 @@ extern "C" {
 #include <avr/io.h>
 }
 
-// TODO see todo in main.cpp. This needs to be defined somewhere else but needed here for now for
-// set_top()
-#ifndef F_CPU
-#define F_CPU 8000000UL
-#endif
+#include <stdint.h>
 
+#include "QuadParams.h"
 #include "Timer1.h"
 
-# include <stdint.h>
 
 Timer1::Timer1() :
     running( false )

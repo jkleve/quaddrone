@@ -70,11 +70,6 @@ extern "C" {
 #include <stdint.h>
 }
 
-// TODO find a better way to define this for whole project
-#ifndef F_CPU
-#define F_CPU 8000000UL
-#endif
-
 #include "QuadMgr.h"
 
 //#define RX_BUFFER_SIZE 128
