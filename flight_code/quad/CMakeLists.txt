@@ -28,7 +28,8 @@ set(AVR_UPLOADTOOL_PORT usb)
 ##########################################################################
 set(AVR_MCU atmega2560)
 set(AVR_H_FUSE 0x99)
-set(AVR_L_FUSE 0xE2)
+set(AVR_L_FUSE 0xC2)
+#set(AVR_L_FUSE 0xE2)
 
 ### END TOOLCHAIN SETUP AREA #############################################
 

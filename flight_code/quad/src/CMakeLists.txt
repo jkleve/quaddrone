@@ -15,7 +15,7 @@ add_avr_executable(
    Timer1.cpp
    Timer0.cpp
    TwiMgr.cpp
-   ImuMgr.cpp
+   #ImuMgr.cpp
    )
 
 #####################################################################

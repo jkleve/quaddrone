@@ -4,6 +4,7 @@
 
 extern "C" {
 #include <avr/io.h> // TODO remove when done
+#include <util/delay.h>
 }
 
 #include "QuadMgr.h"
@@ -13,17 +14,24 @@ Quad::QuadMgr::QuadMgr() :
     commsMgr( Comms::CommsMgr::reference() ),
     quadState( Quad::QuadState::reference() ),
     interruptMgr( Quad::InterruptMgr::reference() ),
-    eepromMgr( Eeprom::EepromMgr::reference() )
+    eepromMgr( Eeprom::EepromMgr::reference() ),
+    twiMgr( twi::TwiMgr::reference() )
 {
 
 }
 
 void Quad::QuadMgr::start()
 {
+    ledMgr.toggle(LED::BLUE);
+    // give some time for initialization
+    _delay_ms(2000);
+    ledMgr.toggle(LED::BLUE);
+
     // init
+    twiMgr.request_read(0x69, 0x00);
 
     // loop
-    loop();
+    //loop();
 }
 
 void Quad::QuadMgr::loop() {

@@ -10,6 +10,7 @@
 * [All You Need to Know About AVR Fuses](http://www.embedds.com/all-you-need-to-know-about-avr-fuses/)
 * [AVR Fuse Calculator](http://www.engbedded.com/fusecalc/)
 * [Timer Calculator](http://eleccelerator.com/avr-timer-calculator/)
+* [Style Guide](http://geosoft.no/development/cppstyle.html)
 
 ### Hardware ###
 

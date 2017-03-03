@@ -10,6 +10,7 @@
 #include "Eeprom.h"
 #include "CommsMgr.h"
 #include "LedMgr.h"
+#include "TwiMgr.h"
 
 namespace Quad {
     //class QuadState;
@@ -25,6 +26,7 @@ namespace Quad {
             QuadState& quadState;
             InterruptMgr& interruptMgr;
             Eeprom::EepromMgr& eepromMgr;
+            twi::TwiMgr& twiMgr;
 
             void loop();
     };

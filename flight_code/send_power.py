@@ -11,8 +11,8 @@ from threading import Thread
 from PyQt4 import QtGui,QtCore
 
 
-#port = serial.Serial(port='/dev/ttyUSB1', 
-port = serial.Serial(port='/dev/ttyACM2', 
+#port = serial.Serial(port='/dev/ttyUSB0', 
+port = serial.Serial(port='/dev/ttyACM0', 
                      baudrate=38400,
                      bytesize=serial.EIGHTBITS,
                      parity=serial.PARITY_NONE,
@@ -84,7 +84,7 @@ def listen():
         d = port.read(1)
         if len(d) > 0:
             v = struct.unpack('B', d)[0]
-            print "%s: %d" % ( time.ctime(time.time()), v )
+            print "%s: %s (%3d)" % ( time.ctime(time.time()), format(v, '#04x'), v )
             #print "%s: %d -> %d" % ( time.ctime(time.time()), v, -1*(v+1)*4 )
 
 def main():
