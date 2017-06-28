@@ -199,7 +199,7 @@ int8_t twi::TwiMgr::readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, ui
 //    return -1;
 //}
 
-bool twi::TwiMgr::idle()
+bool twi::TwiMgr::isIdle()
 {
     while ((TWCR & (1 << TWINT)) == 0)
         //comms.putChar(1);
@@ -209,25 +209,29 @@ bool twi::TwiMgr::idle()
 
 void twi::TwiMgr::sendStart()
 {
-    //TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);
     TWCR = _BV(TWINT) | _BV(TWSTA) | _BV(TWEN);
 }
 
-void twi::TwiMgr::sla_r(uint8_t addr)
+void twi::TwiMgr::sendStop() {
+    TWCR = _BV(TWINT) | _BV(TWSTO) | _BV(TWEN);
+}
+
+void twi::TwiMgr::sendSlaR(uint8_t addr)
 {
     TWDR = (addr << 1) | 0x01;   
     TWCR = _BV(TWINT) | _BV(TWEN);
 }
 
-void twi::TwiMgr::repeatedStart()
+void twi::TwiMgr::sendSlaW(uint8_t addr)
 {
-    TWCR = _BV(TWINT) | _BV(TWSTA) | _BV(TWEN);
+    TWDR = addr << 1;
+    TWCR = _BV(TWINT) | _BV(TWEN);
 }
 
 void twi::TwiMgr::test_read(uint8_t addr)
 {
     sendStart();
-    idle();
+    isIdle();
 
     uint8_t status = 0x00;
 
@@ -238,7 +242,7 @@ void twi::TwiMgr::test_read(uint8_t addr)
         {
             case 0x08:
             case 0x10:
-                sla_r(addr);
+                sendSlaR(addr);
                 comms.putChar(0xAA);
                 break;
             case 0x40:
@@ -255,7 +259,7 @@ void twi::TwiMgr::test_read(uint8_t addr)
                 comms.putChar(0xEE);
                 break;
         }
-        idle();
+        isIdle();
     }
 }
 
@@ -268,7 +272,7 @@ void twi::TwiMgr::request_read(uint8_t addr, uint8_t reg)
     print_status();
 
     sendStart();
-    idle(); // 0x01
+    isIdle(); // 0x01
 
     // TWCR : 0xa4
     // TWSR : 0x08 -> start sent
@@ -281,7 +285,7 @@ void twi::TwiMgr::request_read(uint8_t addr, uint8_t reg)
     //TWDR = (addr << 1) | 0x00; // SLA + W
     //TWDR = 0xD3; // SLA + W
     TWCR |= (1 << TWINT);
-    idle(); // 0x01
+    isIdle(); // 0x01
 
     // repeated start
     if (TWSR == 0x48) {
@@ -297,7 +301,7 @@ void twi::TwiMgr::request_read(uint8_t addr, uint8_t reg)
     //TWDR = 0x6B; // pwr register
     TWDR = 0x75; // who am i register
     TWCR = (1 << TWINT) | (1 << TWEN);
-    idle(); // 0x01
+    isIdle(); // 0x01
 
     // TWCR : 0x84
     // TWSR : 0x30
@@ -392,4 +396,65 @@ void twi::TwiMgr::i2c_start_wait(unsigned char address)
     	break;
      }
 
-}/* i2c_start_wait */
+}
+
+void twi::TwiMgr::sendByte(uint8_t byte) {
+    TWDR = byte;
+    TWCR = _BV(TWINT);
+}
+
+/* i2c_start_wait */
+
+// TODO finish implementing and test
+bool twi::TwiMgr::writeByte(uint8_t devAddr,
+                            uint8_t regAddr,
+                            uint8_t data,
+                            uint8_t timeout)
+{
+    sendStart();
+
+    // Wait for a response
+    while ( timeout-- > 0 && !isIdle() )
+        ;
+
+    // Send SLA+W & address
+    sendSlaW(devAddr);
+
+    // Wait for a response
+    while ( timeout-- > 0 && !isIdle() )
+        ;
+
+    if (TWSR == TX_MODE_ADDR_NACK) {
+        sendStart();
+
+        // Wait for a response
+        while ( timeout-- > 0 && !isIdle() )
+            ;
+
+        sendSlaW(devAddr);
+    }
+
+    if (TWSR == TX_MODE_ADDR_ACK) {
+        sendByte(regAddr);
+
+        // Wait for a response
+        while ( timeout-- > 0 && !isIdle() )
+            ;
+
+        if (TWSR == TX_MODE_DATA_ACK)
+        {
+            // successful RA transmittion
+        }
+
+        sendByte(data);
+
+        // Wait for a response
+        while ( timeout-- > 0 && !isIdle() )
+            ;
+
+        if (TWSR == TX_MODE_DATA_ACK)
+        {
+            sendStop();
+        }
+    }
+}

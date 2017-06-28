@@ -11,6 +11,7 @@ add_avr_executable(
    QuadParams.cpp
    InterruptMgr.cpp
    LedMgr.cpp
+   Mpu.cpp
    Register.cpp
    Timer1.cpp
    Timer0.cpp

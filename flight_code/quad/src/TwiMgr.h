@@ -22,6 +22,8 @@ namespace twi {
     // Master Transmit mode
     static const uint8_t SLA_W_SENT_ACK_RECEIVED    = 0x18;
     static const uint8_t SLA_W_SENT_NOTACK_RECEIVED = 0x20;
+    static const uint8_t TX_MODE_ADDR_ACK           = 0x18;
+    static const uint8_t TX_MODE_ADDR_NACK          = 0x20;
     static const uint8_t TX_MODE_DATA_ACK           = 0x28;
     static const uint8_t TX_MODE_DATA_NOTACK        = 0x30;
 
@@ -46,14 +48,16 @@ namespace twi {
             Comms::CommsMgr& comms;
             Eeprom::EepromMgr& eeprom;
             int8_t readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, uint16_t timeout);
-            bool writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data);
-            bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data);
+            bool writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data, uint8_t timeout = 5);
+            bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint8_t timeout = 5);
             int8_t readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout);
             void print_status();
-            bool idle();
+            bool isIdle();
             void sendStart();
-            void sla_r(uint8_t addr);
-            void repeatedStart();
+            void sendStop();
+            void sendByte(uint8_t byte);
+            void sendSlaR(uint8_t addr);
+            void sendSlaW(uint8_t addr);
     };
 }
 
