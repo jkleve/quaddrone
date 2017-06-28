@@ -3,6 +3,7 @@
 //
 
 extern "C" {
+#include <avr/interrupt.h>
 #include <avr/io.h> // TODO remove when done
 #include <util/delay.h>
 }
@@ -15,20 +16,65 @@ Quad::QuadMgr::QuadMgr() :
     quadState( Quad::QuadState::reference() ),
     interruptMgr( Quad::InterruptMgr::reference() ),
     eepromMgr( Eeprom::EepromMgr::reference() ),
-    twiMgr( twi::TwiMgr::reference() )
+    twiMgr( twi::TwiMgr::reference() ),
+	i2cDriver( i2c::AVRI2CDriver() )
 {
-
+	_delay_ms(1000);
+	//i2cDriver.begin();
+    sei();
 }
 
 void Quad::QuadMgr::start()
 {
+	//uint8_t data[10] = { 0 };
+	//uint8_t stat = 48;
+	//uint8_t timeout = 0;
+	//bool err = false;
+	//while (stat == 48) {
+	//	stat = i2cDriver.readRegister(0x68, 0x75, data);
+	//	commsMgr.putChar(stat);
+	//	if (timeout++ > 20) {
+	//		err = true;
+	//		break;
+	//	}
+	//	_delay_ms(500);
+	//}
+	//if (err)
+	//	commsMgr.putChar(0x11);
+	//else {
+	//	commsMgr.putChar(stat);
+	//	for (int i = 0; i < 10; i++) {
+	//		commsMgr.putChar(data[i]);
+	//	}
+	//}
+    //uint8_t addresses[] = {0x68,
+    //                                  0x69,
+    //                                  0xD0, // 0x68 << 1
+    //                                  0xD1, // 0x68 << 1 & 0x01
+    //                                  0xD2, // 0x69 << 1
+    //                                  0xD3}; // 0x69 << 1 & 0x01
+    //uint8_t num_addr = 6;
+
     ledMgr.toggle(LED::BLUE);
     // give some time for initialization
     _delay_ms(2000);
     ledMgr.toggle(LED::BLUE);
 
-    // init
-    twiMgr.request_read(0x69, 0x00);
+    twiMgr.request_read(0x68, 0x75);
+
+    //// init
+    //for (uint8_t i = 0; i < 128U; i++) {
+    //    commsMgr.putChar(i);
+    //    uint8_t addr = i;
+    //    //uint8_t addr = addresses[i];
+    //    //commsMgr.putChar(addr);
+    //    //twiMgr.i2c_start_wait(addr);
+    //    twiMgr.test_read(addr);
+    //    //uint8_t res = twiMgr.i2c_start(addr);
+    //    //commsMgr.putChar(res);
+    //    _delay_ms(100);
+    //}
+    //twiMgr.request_read(0x69, 0x00);
 
     // loop
     //loop();

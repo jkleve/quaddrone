@@ -24,10 +24,45 @@
  *         EXT PWR on AVR dragon but I have never looked
  *         into this.
  *
+ *  Connecting to APM 2.6 via JTAG connections
+ *
+ *    Analog connections on APM 2.6
+ *     A0      A4 .. A7     A11 SPI
+ *    _______________________________
+ *    | . . . . . . . . . . . . . 4 | -    1: TCK         2: GND (Not used)
+ *    | . . . . . . . . . . . . . . | +    3: TDO         4: VREF
+ *    | . . . . 1 5 3 7 . . . . 6 10| s    5: TMS         6: RESET
+ *    -------------------------------      7: (Not used)  8: (Not used)
+ *                                         9: TDI        10: GND
+ *
+ *   NOTE: VREF is for JTAG connected devices to see voltage.
+ *         This does not provide voltage. A 5V supply will
+ *         need to be supplied. Connecting battery to BEC
+ *         then to APM will do. You may be able to use
+ *         EXT PWR on AVR dragon but I have never looked
+ *         into this.
+ *
+ *  Connecting external MPU to APM 2.6
+ *
+ *   I2C pins on APM 2.6 board
+ *     PM
+ *    _____
+ *    | - |  I2C
+ *    | - | _____
+ *    | - | | 1 |   1: 3.3 V
+ *    | - | | 2 |   2: SCL 1
+ *    | - | | 3 |   3: SDA 1
+ *    | - | | 4 |   4: Unused
+ *    ----- -----
+ *
+ *   NOTE: This is only here because I was having issues talking
+ *         with my internal MPU 6050 and bought an external MPU
+ *         6050 to test.
+ *
  *-----------------------------------------------------------
  * AVR DRAGON
  *
- *  Connection to AVR dragon via SPI connections
+ *  Connection to AVR dragon via SPI/JTAG connections
  *
  *                    /\
  *                    ||  To PC connection
@@ -39,17 +74,17 @@
  *   | . . .                                 |
  *   | . . .                                 |
  *   |                                       |
- *   | . . . . .   2 4 6  .................. |
- *   | . . . . .   1 3 5  .................. |
+ *   | 2 4 6 8 10  2 4 6  .................. |
+ *   | 1 3 5 7 9   1 3 5  .................. |
  *   |    JTAG      SPI                      |
  *   | ....................................  |
  *   | ....................................  |
  *   |  O                                O   |
- *   |  ...................................  |
- *   |  ........................             |
+ *   | ....................................  |
+ *   | .........................             |
  *   |                                       |
- *   |  ........................             |
- *   |  ...................................  |
+ *   | .........................             |
+ *   | ....................................  |
  *   -----------------------------------------
  *
  *-----------------------------------------------------------
@@ -71,6 +106,7 @@ extern "C" {
 }
 
 #include "QuadMgr.h"
+#include "I2CAddrSearcher.h"
 
 //#define RX_BUFFER_SIZE 128
 
@@ -93,9 +129,13 @@ int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking stat
     // Initialize
     //sei();
     Quad::QuadMgr quadMgr;
+    quadMgr.start();
+
+    //test::I2CAddrSearcher i2c;
+
+    //i2c.search();
 
     // Process loop
-    quadMgr.start();
 }
 
 //char peekChar(void)

@@ -15,6 +15,8 @@ add_avr_executable(
    Timer1.cpp
    Timer0.cpp
    TwiMgr.cpp
+   I2CDriver.cpp
+   I2CAddrSearcher.cpp
    #ImuMgr.cpp
    )
 
