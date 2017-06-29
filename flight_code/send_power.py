@@ -27,6 +27,7 @@ def log_message(message):
 
 connection = None
 power = 0
+exit_threads = False
 
 
 class Widget(QtGui.QWidget):
@@ -110,18 +111,33 @@ class Receiver:
         pass
 
     def run(self):
-        while True:
+        while not exit_threads:
             mode = self.hunting()
-            if hasattr(self, mode):
+            if mode is None:  # We didn't get a mode, continue hunting
+                pass
+            elif hasattr(self, mode):
                 data = self.get_data()
-                getattr(self, mode)(data)
+                if data is None:
+                    logging.warning("Timed out while getting data in mode {}".format(mode))
+                else:
+                    getattr(self, mode)(data)
             else:
                 logging.warning("Could not find mode {}".format(mode))
 
+    # TODO add a checksum to packet
     def get_data(self):
+        """
+        Receive the data section of the packet
+        :return: Data section of packet received. None if we timedout before 'end' was recieved
+        """
+        start = time.time()
         data = list()
         b = self.get_byte()
         while b != self.modes['end']:
+            # Timeout after 5 milliseconds of looking for 'end'
+            # Tested with the string 'Hello'. It took about 1.5 milliseconds to receive
+            if time.time() - start > 0.005:
+                return None
             data.append(b)
             b = self.get_byte()
         return data
@@ -151,10 +167,12 @@ class Receiver:
         log_message("(twi_msg) {}".format(TWI_MESSAGES[twi_mode]))
 
     def hunting(self):
-        while True:
-            b = self.get_byte()
-            if b in self.modes.values():
-                return self._mode_to_string[b]
+        #while True:
+        b = self.get_byte()
+        if b in self.modes.values():
+            return self._mode_to_string[b]
+        else:
+            return None
 
 
 #def listen():
@@ -172,6 +190,7 @@ def gui():
     app = QtGui.QApplication(sys.argv)
     ex = Widget()
     sys.exit(app.exec_())
+
 
 
 if __name__ == '__main__':
@@ -198,4 +217,17 @@ if __name__ == '__main__':
 
     #Thread(target=gui).start()
     receiver = Receiver()
-    Thread(target=receiver.run).start()
+    listening_thread = Thread(target=receiver.run)
+    listening_thread.start()
+
+    try:
+        while True:
+            time.sleep(.1)
+    except (KeyboardInterrupt, SystemExit):
+        print("")  # Print a newline character
+        logging.info("Caught keyboard interrupt")
+        # Tell threads to exit
+        exit_threads = True
+        # Wait for threads to exit
+        listening_thread.join()
+        sys.exit(0)
