@@ -417,6 +417,12 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
     while ( timeout-- > 0 && !isIdle() )
         ;
 
+    print_status();
+
+    sendStop();
+
+    return true;
+
     // Send SLA+W & address
     sendSlaW(devAddr);
 

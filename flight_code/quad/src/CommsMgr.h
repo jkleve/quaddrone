@@ -9,8 +9,16 @@
 
 namespace Comms {
 
+    // Modes
+    //static const START
+
     #define USART_BAUD	38400UL		// Define Baud rate
     uint8_t const FrameHeader = 0x02;
+
+    enum MsgType {
+        STRING,
+        TWI_MESSAGE
+    };
 
     struct Frame {
         uint8_t msg;
@@ -26,6 +34,9 @@ namespace Comms {
             void putChar(uint8_t byte);
             uint8_t getChar(void);
             Frame getFrame(void);
+            void sendString(const char* string);
+            void sendTwiMsg(const char msg);
+            //void sendMsg(const char* string, MsgType msg_type);
         private:
             CommsMgr();
     };

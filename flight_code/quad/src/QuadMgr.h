@@ -9,7 +9,7 @@
 #include "InterruptMgr.h"
 #include "Eeprom.h"
 #include "CommsMgr.h"
-#include "I2CDriver.h"
+//#include "I2CDriver.h"
 #include "LedMgr.h"
 #include "TwiMgr.h"
 
@@ -28,7 +28,7 @@ namespace Quad {
             InterruptMgr& interruptMgr;
             Eeprom::EepromMgr& eepromMgr;
             twi::TwiMgr& twiMgr;
-            i2c::AVRI2CDriver i2cDriver;
+            //i2c::AVRI2CDriver i2cDriver;
 
             void loop();
     };

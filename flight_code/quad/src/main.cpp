@@ -105,27 +105,17 @@ extern "C" {
 #include <stdint.h>
 }
 
+#include "CommsMgr.h"
 #include "QuadMgr.h"
 #include "I2CAddrSearcher.h"
-
-//#define RX_BUFFER_SIZE 128
-
-//struct data {
-//  int8_t roll;
-//  int8_t pitch;
-//  int8_t yaw;
-//} data_t;
-//
-//char rxBuffer[RX_BUFFER_SIZE];
-//uint8_t rxReadPos = 0;
-//uint8_t rxWritePos = 0;
-//
-//char getChar(void);
 
 int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking statment
 // before you start reading, start a timer, read the bytes, stop the timer, send the time back or 
 // write to EEPROM. i want to see if thats feasible to read them all in a row
 {
+    Comms::CommsMgr& comms = Comms::CommsMgr::reference();
+    comms.sendString("Hello");
+    comms.sendTwiMsg(0x08);
     // Initialize
     //sei();
     Quad::QuadMgr quadMgr;
@@ -136,35 +126,7 @@ int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking stat
     //i2c.search();
 
     // Process loop
+
+    return 0;
 }
 
-//char peekChar(void)
-//{
-//  char ret = '\0';
-//
-//  if (rxReadPos != rxWritePos)
-//  {
-//    ret = rxBuffer[rxReadPos];
-//  }
-//
-//  return ret;
-//}
-//
-//char getChar(void)
-//{
-//  char ret = '\0';
-//
-//  if (rxReadPos != rxWritePos)
-//  {
-//    ret = rxBuffer[rxReadPos];
-//
-//    rxReadPos++;
-//
-//    if (rxReadPos >= RX_BUFFER_SIZE)
-//    {
-//      rxReadPos = 0;
-//    }
-//  }
-//
-//  return ret;
-//}

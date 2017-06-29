@@ -6,6 +6,7 @@
 
 extern "C" {
 #include <avr/io.h>
+#include <string.h>
 //#include "clock_speed.h"
 }
 
@@ -55,5 +56,37 @@ uint8_t Comms::CommsMgr::getChar(void) {
 Comms::Frame Comms::CommsMgr::getFrame(void) {
     return Comms::Frame();
 }
+
+void Comms::CommsMgr::sendString(const char *string) {
+    putChar(0xff); // Send 'string' mode
+
+    uint8_t size = strlen(string);
+    for (uint8_t i = 0; i < size; i++) {
+        putChar(string[i]);
+    }
+
+    putChar(0x00); // Send 'end' mode
+}
+
+void Comms::CommsMgr::sendTwiMsg(const char msg) {
+    putChar(0xfe); // Send 'twi_msg' mode
+    putChar(msg);
+    putChar(0x00); // Send 'end' mode
+}
+
+//void Comms::CommsMgr::sendMsg(const char *string, MsgType msgType) {
+//    switch (msgType) {
+//        case STRING:
+//            sendString(string);
+//            break;
+//        case TWI_MESSAGE:
+//            putChar(0xfe);
+//            putChar(string[0]); // string should only be 1 char long
+//            break;
+//        default:
+//            break;
+//    }
+//    putChar(0x00);
+//}
 
 

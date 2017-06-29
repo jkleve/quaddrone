@@ -14,6 +14,7 @@ const uint32_t I2C_BAUD = 400000; // fast mode (400 kHz)
 
 namespace twi {
 
+    // TODO made these an enum
     // Common
     static const uint8_t START_TRANSMITTED          = 0x08;
     static const uint8_t REPEATED_START_TRANSMITTED = 0x10;
@@ -43,12 +44,12 @@ namespace twi {
             void request_read(uint8_t addr, uint8_t reg);
             uint8_t i2c_start(uint8_t);
             void i2c_start_wait(unsigned char address);
+            bool writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data, uint8_t timeout = 5);
         private:
             TwiMgr();
             Comms::CommsMgr& comms;
             Eeprom::EepromMgr& eeprom;
             int8_t readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, uint16_t timeout);
-            bool writeByte(uint8_t devAddr, uint8_t regAddr, uint8_t data, uint8_t timeout = 5);
             bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint8_t timeout = 5);
             int8_t readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout);
             void print_status();
