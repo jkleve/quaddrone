@@ -74,7 +74,28 @@ void Comms::CommsMgr::sendTwiMsg(const char msg) {
     putChar(0x00); // Send 'end' mode
 }
 
-//void Comms::CommsMgr::sendMsg(const char *string, MsgType msgType) {
+void Comms::CommsMgr::sendPacket(const Comms::Packet packet) {
+    putChar(packet.pktType);
+
+    for (uint8_t i = 0; i < packet.nData; i++) {
+        putChar(packet.data[i]);
+    }
+
+    putChar( getChecksum(packet.data, packet.nData) );
+
+    putChar(0x00); // Send 'end' mode
+}
+
+uint8_t Comms::CommsMgr::getChecksum(const uint8_t* data, uint8_t nData) {
+    uint8_t checksum = 0;
+    for (uint8_t i = 0; i < nData; i++)
+    {
+        checksum += data[i];
+    }
+    return ~checksum;
+}
+
+//void Comms::CommsMgr::sendMsg(const char *string, PktType msgType) {
 //    switch (msgType) {
 //        case STRING:
 //            sendString(string);

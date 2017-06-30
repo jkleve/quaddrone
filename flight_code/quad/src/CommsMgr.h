@@ -15,9 +15,16 @@ namespace Comms {
     #define USART_BAUD	38400UL		// Define Baud rate
     uint8_t const FrameHeader = 0x02;
 
-    enum MsgType {
-        STRING,
-        TWI_MESSAGE
+    enum PktType {
+        STRING = 0xff,
+        TWI_MESSAGE = 0xfe
+    };
+
+    struct Packet {
+        PktType pktType;
+        uint8_t* data;
+        uint8_t nData;
+        uint8_t checksum;
     };
 
     struct Frame {
@@ -36,9 +43,11 @@ namespace Comms {
             Frame getFrame(void);
             void sendString(const char* string);
             void sendTwiMsg(const char msg);
-            //void sendMsg(const char* string, MsgType msg_type);
+            void sendPacket(const Packet packet);
+            //void sendMsg(const char* string, PktType msg_type);
         private:
             CommsMgr();
+            uint8_t getChecksum(const uint8_t * data, uint8_t nData);
     };
 }
 

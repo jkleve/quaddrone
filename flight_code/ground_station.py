@@ -86,14 +86,30 @@ def write(window, val):
     data = connection.write(struct.pack('B', val))
 
 
+def getChecksum(data):
+    checksum = 0
+
+    for d in data:
+        checksum += d
+        if checksum > 0xff:
+            checksum = d % 0xff
+
+    # Get inverse and convert to unsigned
+    return ~checksum + 2**8
+
+
 TWI_MESSAGES = dict([
-        (8, 'Start sent'),
-        (16, 'Repeated start sent'),
-        (24, 'SLA+W transmitted, received ACK'),
-        (32, 'SLA+W transmitted, received NACK'),
-        (40, 'Data transmitted, received ACK'),
-        (48, 'Data transmitted, received NACK'),
-        (56, 'Arbitration lost in SLA+W or data bytes')
+        (0x08, 'Start sent'),
+        (0x10, 'Repeated start sent'),
+        (0x18, 'SLA+W transmitted, received ACK'),
+        (0x20, 'SLA+W transmitted, received NACK'),
+        (0x28, 'Data transmitted, received ACK'),
+        (0x30, 'Data transmitted, received NACK'),
+        (0x38, 'Arbitration lost in SLA+W or data bytes'),
+        (0x40, 'SLA+R transmitted, received ACK'),
+        (0x48, 'SLA+R transmitted, received NACK'),
+        (0x50, 'Data received, transmitted ACK'),
+        (0x58, 'Data received, transmitted NACK')
     ])
 
 
@@ -132,6 +148,8 @@ class Receiver:
         """
         start = time.time()
         data = list()
+
+        # Get data
         b = self.get_byte()
         while b != self.modes['end']:
             # Timeout after 5 milliseconds of looking for 'end'
@@ -140,6 +158,9 @@ class Receiver:
                 return None
             data.append(b)
             b = self.get_byte()
+
+        # Calculate and compare checksum
+
         return data
 
     def get_byte(self):
@@ -210,6 +231,7 @@ if __name__ == '__main__':
                 break
         else:
             logging.info("Connected on {}".format(port))
+            break
 
     if connection is None:
         logging.critical("Couldn't connect to device on any port")
