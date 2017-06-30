@@ -165,8 +165,10 @@ class Receiver:
         # Calculate and compare checksum
         checksum = get_checksum(data[0:-1])
 
-        if checksum != data[-1]:
-            logging.warning("Received bad checksum ({} != {}".format(checksum, data[-1]))
+        #if checksum != data[-1]:
+        if checksum != 0:
+            logging.warning("\n Received bad checksum ({} != {})"
+                            "\n Throwing out data {}".format(checksum, data[-1], data[0:-1]))
             return None
 
         return Packet(data[0:-1], checksum)
