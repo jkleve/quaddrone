@@ -6,13 +6,13 @@ add_avr_executable(
    main.cpp
    CommsMgr.cpp
    Eeprom.cpp
+   Ground.cpp
    QuadState.cpp
    QuadMgr.cpp
    QuadParams.cpp
    InterruptMgr.cpp
    LedMgr.cpp
    #Mpu.cpp
-   #Register.cpp
    Timer1.cpp
    Timer0.cpp
    TwiMgr.cpp

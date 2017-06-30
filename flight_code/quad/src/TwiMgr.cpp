@@ -7,16 +7,14 @@ extern "C" {
 #include <util/twi.h>
 }
 
-#include "Eeprom.h"
 #include "TwiMgr.h"
 
-#define TWI_STATUS      (TWSR & 0xF8)
+// TODO move to common file
 #define cbi(sfr, bit)   (_SFR_BYTE(sfr) &= ~_BV(bit))
 #define sbi(sfr, bit)   (_SFR_BYTE(sfr) |= _BV(bit))
 
 twi::TwiMgr::TwiMgr() :
-    comms( Comms::CommsMgr::reference() ),
-    eeprom( Eeprom::EepromMgr::reference() )
+    ground_( ground::Ground::reference() )
 {
     // TWI Bit Rate Register
     TWBR = ((F_CPU / I2C_BAUD) - 16)/2;
@@ -212,56 +210,57 @@ void twi::TwiMgr::sendStart()
     TWCR = _BV(TWINT) | _BV(TWSTA) | _BV(TWEN);
 }
 
-void twi::TwiMgr::sendStop() {
+void twi::TwiMgr::sendStop()
+{
     TWCR = _BV(TWINT) | _BV(TWSTO) | _BV(TWEN);
 }
 
-void twi::TwiMgr::sendSlaR(uint8_t addr)
+void twi::TwiMgr::sendSlaR(uint8_t address)
 {
-    TWDR = (addr << 1) | 0x01;   
+    TWDR = (address << 1) | 0x01;
     TWCR = _BV(TWINT) | _BV(TWEN);
 }
 
-void twi::TwiMgr::sendSlaW(uint8_t addr)
+void twi::TwiMgr::sendSlaW(uint8_t address)
 {
-    TWDR = addr << 1;
+    TWDR = address << 1;
     TWCR = _BV(TWINT) | _BV(TWEN);
 }
 
-void twi::TwiMgr::test_read(uint8_t addr)
-{
-    sendStart();
-    isIdle();
-
-    uint8_t status = 0x00;
-
-    while (status != 0x40) {
-        status = TWI_STATUS;
-        comms.putChar(status); 
-        switch (TWSR)
-        {
-            case 0x08:
-            case 0x10:
-                sendSlaR(addr);
-                comms.putChar(0xAA);
-                break;
-            case 0x40:
-                comms.putChar(0x42);
-                break;
-            case 0x48:
-                TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWSTO);  // send a stop
-                //sendStart();
-                //repeatedStart();
-                comms.putChar(0xBB);
-                return;
-                break;
-            default:
-                comms.putChar(0xEE);
-                break;
-        }
-        isIdle();
-    }
-}
+//void twi::TwiMgr::test_read(uint8_t addr)
+//{
+//    sendStart();
+//    isIdle();
+//
+//    uint8_t status = 0x00;
+//
+//    while (status != 0x40) {
+//        status = TWI_STATUS;
+//        comms.putChar(status);
+//        switch (TWSR)
+//        {
+//            case 0x08:
+//            case 0x10:
+//                sendSlaR(addr);
+//                comms.putChar(0xAA);
+//                break;
+//            case 0x40:
+//                comms.putChar(0x42);
+//                break;
+//            case 0x48:
+//                TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWSTO);  // send a stop
+//                //sendStart();
+//                //repeatedStart();
+//                comms.putChar(0xBB);
+//                return;
+//                break;
+//            default:
+//                comms.putChar(0xEE);
+//                break;
+//        }
+//        isIdle();
+//    }
+//}
 
 void twi::TwiMgr::request_read(uint8_t addr, uint8_t reg)
 {
@@ -310,93 +309,93 @@ void twi::TwiMgr::request_read(uint8_t addr, uint8_t reg)
     print_status();
 }
 
-void twi::TwiMgr::print_status()
-{
-    comms.putChar(TWCR);
-    comms.putChar(TWSR & 0xF8);
-    comms.putChar(TWDR);
-    comms.putChar('-');
-}
+//void twi::TwiMgr::print_status()
+//{
+//    comms.putChar(TWCR);
+//    comms.putChar(TWSR & 0xF8);
+//    comms.putChar(TWDR);
+//    comms.putChar('-');
+//}
 
-uint8_t twi::TwiMgr::i2c_start(uint8_t address)
-{
-	// reset TWI control register
-	TWCR = 0;
-	// transmit START condition
-	TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
-	// wait for end of transmission
-	while( !(TWCR & (1<<TWINT)) );
+//uint8_t twi::TwiMgr::i2c_start(uint8_t address)
+//{
+//	// reset TWI control register
+//	TWCR = 0;
+//	// transmit START condition
+//	TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
+//	// wait for end of transmission
+//	while( !(TWCR & (1<<TWINT)) );
+//
+//	// check if the start condition was successfully transmitted
+//	if((TWSR & 0xF8) != TW_START){ return 1; }
+//
+//	// load slave address into data register
+//	TWDR = address;
+//	// start transmission of address
+//	TWCR = (1<<TWINT) | (1<<TWEN);
+//	// wait for end of transmission
+//	while( !(TWCR & (1<<TWINT)) );
+//
+//	// check if the device has acknowledged the READ / WRITE mode
+//	uint8_t twst = TW_STATUS & 0xF8;
+//	if ( (twst != TW_MT_SLA_ACK) && (twst != TW_MR_SLA_ACK) ) return 2;
+//
+//	return 0;
+//}
 
-	// check if the start condition was successfully transmitted
-	if((TWSR & 0xF8) != TW_START){ return 1; }
-
-	// load slave address into data register
-	TWDR = address;
-	// start transmission of address
-	TWCR = (1<<TWINT) | (1<<TWEN);
-	// wait for end of transmission
-	while( !(TWCR & (1<<TWINT)) );
-
-	// check if the device has acknowledged the READ / WRITE mode
-	uint8_t twst = TW_STATUS & 0xF8;
-	if ( (twst != TW_MT_SLA_ACK) && (twst != TW_MR_SLA_ACK) ) return 2;
-
-	return 0;
-}
-
-#define I2C_TIMER_DELAY 10
-
-void twi::TwiMgr::i2c_start_wait(unsigned char address)
-{
-	uint32_t  i2c_timer = 0;
-	uint8_t   twst;
-	uint8_t attempts = 0;
-
-    while ( 1 )
-    {
-        if (attempts++ > 10) {
-            comms.putChar(0x05);
-            break;
-        }
-	    // send START condition
-	    TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
-
-    	// wait until transmission completed 
-	    i2c_timer = I2C_TIMER_DELAY;
-    	while(!(TWCR & (1<<TWINT)) && i2c_timer--);
-
-    	// check value of TWI Status Register. Mask prescaler bits.
-    	twst = TW_STATUS & 0xF8;
-    	if ( (twst != TW_START) && (twst != TW_REP_START)) continue;
-
-    	// send device address
-    	TWDR = address;
-    	TWCR = (1<<TWINT) | (1<<TWEN);
-
-    	// wail until transmission completed
-    	i2c_timer = I2C_TIMER_DELAY;
-    	while(!(TWCR & (1<<TWINT)) && i2c_timer--);
-
-    	// check value of TWI Status Register. Mask prescaler bits.
-    	twst = TW_STATUS & 0xF8;
-    	comms.putChar(twst);
-    	if ( (twst == TW_MT_SLA_NACK )||(twst ==TW_MR_DATA_NACK) )
-    	{
-    	    /* device busy, send stop condition to terminate write operation */
-	        TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO);
-
-	        // wait until stop condition is executed and bus released
-	        i2c_timer = I2C_TIMER_DELAY;
-	        while((TWCR & (1<<TWSTO)) && i2c_timer--);
-            comms.putChar(0x01);
-    	    continue;
-    	}
-    	//if( twst != TW_MT_SLA_ACK) return 1;
-    	comms.putChar(0x42);
-    	break;
-     }
-
-}
+//#define I2C_TIMER_DELAY 10
+//
+//void twi::TwiMgr::i2c_start_wait(unsigned char address)
+//{
+//	uint32_t  i2c_timer = 0;
+//	uint8_t   twst;
+//	uint8_t attempts = 0;
+//
+//    while ( 1 )
+//    {
+//        if (attempts++ > 10) {
+//            comms.putChar(0x05);
+//            break;
+//        }
+//	    // send START condition
+//	    TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
+//
+//    	// wait until transmission completed
+//	    i2c_timer = I2C_TIMER_DELAY;
+//    	while(!(TWCR & (1<<TWINT)) && i2c_timer--);
+//
+//    	// check value of TWI Status Register. Mask prescaler bits.
+//    	twst = TW_STATUS & 0xF8;
+//    	if ( (twst != TW_START) && (twst != TW_REP_START)) continue;
+//
+//    	// send device address
+//    	TWDR = address;
+//    	TWCR = (1<<TWINT) | (1<<TWEN);
+//
+//    	// wail until transmission completed
+//    	i2c_timer = I2C_TIMER_DELAY;
+//    	while(!(TWCR & (1<<TWINT)) && i2c_timer--);
+//
+//    	// check value of TWI Status Register. Mask prescaler bits.
+//    	twst = TW_STATUS & 0xF8;
+//    	comms.putChar(twst);
+//    	if ( (twst == TW_MT_SLA_NACK )||(twst ==TW_MR_DATA_NACK) )
+//    	{
+//    	    /* device busy, send stop condition to terminate write operation */
+//	        TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO);
+//
+//	        // wait until stop condition is executed and bus released
+//	        i2c_timer = I2C_TIMER_DELAY;
+//	        while((TWCR & (1<<TWSTO)) && i2c_timer--);
+//            comms.putChar(0x01);
+//    	    continue;
+//    	}
+//    	//if( twst != TW_MT_SLA_ACK) return 1;
+//    	comms.putChar(0x42);
+//    	break;
+//     }
+//
+//}
 
 void twi::TwiMgr::sendByte(uint8_t byte) {
     TWDR = byte;
@@ -417,7 +416,13 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
     while ( timeout-- > 0 && !isIdle() )
         ;
 
-    print_status();
+   // comms::Packet packet;
+   // packet.pktType = comms::REGISTER;
+   //
+   // packet.data =
+
+    //print_status();
+    sendStatus();
 
     sendStop();
 
@@ -463,4 +468,9 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
             sendStop();
         }
     }
+}
+
+void twi::TwiMgr::sendStatus()
+{
+    ground_.sendTwiMessage( TWI_STATUS );
 }

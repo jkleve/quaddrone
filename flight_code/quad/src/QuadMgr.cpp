@@ -12,11 +12,12 @@ extern "C" {
 
 Quad::QuadMgr::QuadMgr() :
     ledMgr( LED::LedMgr::reference() ),
-    commsMgr( Comms::CommsMgr::reference() ),
+    commsMgr( comms::CommsMgr::reference() ),
     quadState( Quad::QuadState::reference() ),
     interruptMgr( Quad::InterruptMgr::reference() ),
     eepromMgr( Eeprom::EepromMgr::reference() ),
-    twiMgr( twi::TwiMgr::reference() )
+    twiMgr( twi::TwiMgr::reference() ),
+    ground_( ground::Ground::reference() )
 	//i2cDriver( i2c::AVRI2CDriver() )
 {
 	_delay_ms(1000);
@@ -81,35 +82,35 @@ void Quad::QuadMgr::start()
     //loop();
 }
 
-void Quad::QuadMgr::loop() {
-    do {
-        interruptMgr.pollInterupts();
-
-        // Processesing to be done at 20Hz.
-        // TODO add error for if we are taking too long
-        if( quadState.getstate( MainProcessesing ) )
-        {
-            // need to move stuff here after debugging
-            if( quadState.received() )
-            {
-                uint8_t d = commsMgr.getChar();
-                commsMgr.putChar(d);
-                quadState.unset( State::ReceivedMsg );
-            }
-
-            quadState.unset(MainProcessesing);
-        }
-
-        if( quadState.getstate( OneHzTimer ) )
-        {
-            ledMgr.toggle( LED::RED );
-            quadState.unset(OneHzTimer);
-        }
-
-        if( quadState.abort() )
-        {
-            // de-init
-            break;
-        }
-    } while (true);
-}
+//void Quad::QuadMgr::loop() {
+//    do {
+//        interruptMgr.pollInterupts();
+//
+//        // Processesing to be done at 20Hz.
+//        // TODO add error for if we are taking too long
+//        if( quadState.getstate( MainProcessesing ) )
+//        {
+//            // need to move stuff here after debugging
+//            if( quadState.received() )
+//            {
+//                uint8_t d = commsMgr.getChar();
+//                commsMgr.putChar(d);
+//                quadState.unset( State::ReceivedMsg );
+//            }
+//
+//            quadState.unset(MainProcessesing);
+//        }
+//
+//        if( quadState.getstate( OneHzTimer ) )
+//        {
+//            ledMgr.toggle( LED::RED );
+//            quadState.unset(OneHzTimer);
+//        }
+//
+//        if( quadState.abort() )
+//        {
+//            // de-init
+//            break;
+//        }
+//    } while (true);
+//}

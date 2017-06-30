@@ -98,26 +98,16 @@
  */
 
 extern "C" {
-#include <avr/io.h>
 #include <avr/interrupt.h>
-
-#include <util/delay.h> // TODO temporary for debugging
-#include <stdint.h>
 }
 
-#include "CommsMgr.h"
 #include "QuadMgr.h"
-#include "I2CAddrSearcher.h"
 
 int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking statment
 // before you start reading, start a timer, read the bytes, stop the timer, send the time back or 
 // write to EEPROM. i want to see if thats feasible to read them all in a row
 {
-    Comms::CommsMgr& comms = Comms::CommsMgr::reference();
-    comms.sendString("Hello");
-    comms.sendTwiMsg(0x08);
     // Initialize
-    //sei();
     Quad::QuadMgr quadMgr;
     quadMgr.start();
 

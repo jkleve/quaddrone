@@ -2,6 +2,7 @@
 # 6/14/16 (CAC)
 # Dummy transmitter for output testing
 
+from collections import namedtuple
 from ctypes import *
 from errno import EACCES, EPERM
 import logging
@@ -12,6 +13,7 @@ import time
 from threading import Thread
 from PyQt4 import QtGui, QtCore
 
+Packet = namedtuple('Packet', 'data checksum')
 
 # Create a new log level
 MESSAGE_LOG_LEVEL = 25
@@ -86,13 +88,13 @@ def write(window, val):
     data = connection.write(struct.pack('B', val))
 
 
-def getChecksum(data):
+def get_checksum(data):
     checksum = 0
 
     for d in data:
         checksum += d
-        if checksum > 0xff:
-            checksum = d % 0xff
+
+    checksum = checksum % 0xff
 
     # Get inverse and convert to unsigned
     return ~checksum + 2**8
@@ -132,16 +134,17 @@ class Receiver:
             if mode is None:  # We didn't get a mode, continue hunting
                 pass
             elif hasattr(self, mode):
-                data = self.get_data()
-                if data is None:
+                packet = self.get_packet()
+
+                if packet is None:
                     logging.warning("Timed out while getting data in mode {}".format(mode))
                 else:
+                    data = packet.data
                     getattr(self, mode)(data)
             else:
                 logging.warning("Could not find mode {}".format(mode))
 
-    # TODO add a checksum to packet
-    def get_data(self):
+    def get_packet(self):
         """
         Receive the data section of the packet
         :return: Data section of packet received. None if we timedout before 'end' was recieved
@@ -160,8 +163,13 @@ class Receiver:
             b = self.get_byte()
 
         # Calculate and compare checksum
+        checksum = get_checksum(data[0:-1])
 
-        return data
+        if checksum != data[-1]:
+            logging.warning("Received bad checksum ({} != {}".format(checksum, data[-1]))
+            return None
+
+        return Packet(data[0:-1], checksum)
 
     def get_byte(self):
         d = connection.read(1)
@@ -183,7 +191,7 @@ class Receiver:
 
     def twi_msg(self, data):
         if len(data) > 1:
-            log.warning("Received more than 1 byte in twi_msg mode")
+            logging.warning("Received more than 1 byte in twi_msg mode")
         twi_mode = data[0]  # We should only have 1 byte
         log_message("(twi_msg) {}".format(TWI_MESSAGES[twi_mode]))
 

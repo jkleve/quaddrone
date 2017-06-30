@@ -6,11 +6,10 @@
 
 extern "C" {
 #include <avr/io.h>
-#include <string.h>
-//#include "clock_speed.h"
 }
 
-Comms::CommsMgr::CommsMgr() {
+comms::CommsMgr::CommsMgr()
+{
     /* Asynchronous USART (UMSEL01 & UMSEL00 = 0)				  *
      * Parity Mode disabled (UPM01 & UPM00 = 0)					  *
      * stop bits: 1-bit (USBS0 = 0)								  *
@@ -38,55 +37,39 @@ Comms::CommsMgr::CommsMgr() {
     UBRR0 = F_CPU / (8 * USART_BAUD) - 1;
 }
 
-void Comms::CommsMgr::putChar(uint8_t byte) {
+void comms::CommsMgr::putChar(uint8_t byte)
+{
     while ((UCSR0A & (1 << UDRE0)) == 0);	// Wait for empty buffer
     UDR0 = byte; /* USART I/O Data Register */
 }
 
-Comms::CommsMgr &Comms::CommsMgr::reference() {
-    static Comms::CommsMgr ref;
+comms::CommsMgr &comms::CommsMgr::reference()
+{
+    static comms::CommsMgr ref;
     return ref;
 }
 
-uint8_t Comms::CommsMgr::getChar(void) {
+uint8_t comms::CommsMgr::getChar(void)
+{
     uint8_t byte = (uint8_t) UDR0;
     return byte;
 }
 
-Comms::Frame Comms::CommsMgr::getFrame(void) {
-    return Comms::Frame();
-}
+void comms::CommsMgr::sendMessage(const ground::Message message)
+{
+    putChar(message.msgType);
 
-void Comms::CommsMgr::sendString(const char *string) {
-    putChar(0xff); // Send 'string' mode
-
-    uint8_t size = strlen(string);
-    for (uint8_t i = 0; i < size; i++) {
-        putChar(string[i]);
+    for (uint8_t i = 0; i < message.nData; i++) {
+        putChar(message.data[i]);
     }
 
-    putChar(0x00); // Send 'end' mode
+    putChar( getChecksum(message.data, message.nData) );
+
+    putChar(END_PACKET);
 }
 
-void Comms::CommsMgr::sendTwiMsg(const char msg) {
-    putChar(0xfe); // Send 'twi_msg' mode
-    putChar(msg);
-    putChar(0x00); // Send 'end' mode
-}
-
-void Comms::CommsMgr::sendPacket(const Comms::Packet packet) {
-    putChar(packet.pktType);
-
-    for (uint8_t i = 0; i < packet.nData; i++) {
-        putChar(packet.data[i]);
-    }
-
-    putChar( getChecksum(packet.data, packet.nData) );
-
-    putChar(0x00); // Send 'end' mode
-}
-
-uint8_t Comms::CommsMgr::getChecksum(const uint8_t* data, uint8_t nData) {
+uint8_t comms::CommsMgr::getChecksum(const uint8_t* data, uint8_t nData)
+{
     uint8_t checksum = 0;
     for (uint8_t i = 0; i < nData; i++)
     {
@@ -94,20 +77,4 @@ uint8_t Comms::CommsMgr::getChecksum(const uint8_t* data, uint8_t nData) {
     }
     return ~checksum;
 }
-
-//void Comms::CommsMgr::sendMsg(const char *string, PktType msgType) {
-//    switch (msgType) {
-//        case STRING:
-//            sendString(string);
-//            break;
-//        case TWI_MESSAGE:
-//            putChar(0xfe);
-//            putChar(string[0]); // string should only be 1 char long
-//            break;
-//        default:
-//            break;
-//    }
-//    putChar(0x00);
-//}
-
 
