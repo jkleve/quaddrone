@@ -421,12 +421,7 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
    //
    // packet.data =
 
-    //print_status();
     sendStatus();
-
-    sendStop();
-
-    return true;
 
     // Send SLA+W & address
     sendSlaW(devAddr);
@@ -435,7 +430,9 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
     while ( timeout-- > 0 && !isIdle() )
         ;
 
-    if (TWSR == TX_MODE_ADDR_NACK) {
+    sendStatus();
+
+    if (TWI_STATUS == TX_MODE_ADDR_NACK) {
         sendStart();
 
         // Wait for a response
@@ -467,6 +464,12 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
         {
             sendStop();
         }
+
+        return true;
+    }
+    else {
+        sendStop();
+        return false;
     }
 }
 
