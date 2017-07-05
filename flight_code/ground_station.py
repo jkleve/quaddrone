@@ -94,7 +94,7 @@ def get_checksum(data):
     for d in data:
         checksum += d
 
-    checksum = checksum % 0xff
+    checksum = checksum % 0x100
 
     # Get inverse and convert to unsigned
     return ~checksum + 2**8
@@ -114,11 +114,16 @@ TWI_MESSAGES = dict([
         (0x58, 'Data received, transmitted NACK')
     ])
 
+REGISTERS = dict([
+    (0xBC, 'TWCR')
+])
+
 
 class Receiver:
     modes = {
         'string': 0xff,
         'twi_msg': 0xfe,
+        'register': 0xfd,
         'test': 0x48,
         'end': 0x00
     }
@@ -126,7 +131,8 @@ class Receiver:
     _mode_to_string = {v: k for k, v in modes.items()}
 
     def __init__(self):
-        pass
+        self.num_bytes = 0
+        self.mode = None
 
     def run(self):
         while not exit_threads:
@@ -134,10 +140,11 @@ class Receiver:
             if mode is None:  # We didn't get a mode, continue hunting
                 pass
             elif hasattr(self, mode):
+                self.mode = mode
                 packet = self.get_packet()
 
                 if packet is None:
-                    logging.warning("Timed out while getting data in mode {}".format(mode))
+                    logging.warning("Failed to receive packet")
                 else:
                     data = packet.data
                     getattr(self, mode)(data)
@@ -158,6 +165,7 @@ class Receiver:
             # Timeout after 5 milliseconds of looking for 'end'
             # Tested with the string 'Hello'. It took about 1.5 milliseconds to receive
             if time.time() - start > 0.005:
+                logging.warning("Timed out while getting data in mode {}".format(self.mode))
                 return None
             data.append(b)
             b = self.get_byte()
@@ -175,7 +183,11 @@ class Receiver:
     def get_byte(self):
         d = connection.read(1)
         if len(d) > 0:
-            return struct.unpack('B', d)[0]
+            self.num_bytes += 1
+            # print(self.num_bytes)
+            b = struct.unpack('B', d)[0]
+            print("received {}".format(b))
+            return b
 
     def test(self, data):
         print(data)
@@ -190,11 +202,22 @@ class Receiver:
         s = ''.join([chr(b) for b in data])
         log_message("(string) {}".format(s))
 
+    def register(self, data):
+        if len(data) != 2:
+            logging.warning("\n Received unexpected number of bytes in register mode"
+                            "\n {} instead of 2 bytes".format(len(data)))
+
+        if len(data) >= 2:
+            log_message("(register {}) {}".format(REGISTERS[data[0]], data[1]))
+
     def twi_msg(self, data):
         if len(data) > 1:
             logging.warning("Received more than 1 byte in twi_msg mode")
         twi_mode = data[0]  # We should only have 1 byte
-        log_message("(twi_msg) {}".format(TWI_MESSAGES[twi_mode]))
+        try:
+            log_message("(twi_msg) {}".format(TWI_MESSAGES[twi_mode]))
+        except KeyError as err:
+            logging.warning("Couldn't find TWI message {}".format(hex(twi_mode)))
 
     def hunting(self):
         #while True:

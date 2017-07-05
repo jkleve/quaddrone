@@ -68,10 +68,11 @@ namespace twi {
     private:
         TwiMgr();
         int8_t readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, uint16_t timeout);
-        bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint8_t timeout = 5);
+        bool writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint8_t timeout = 15);
         int8_t readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout);
         void print_status();
         bool isIdle();
+        void waitUntilIdle();
         void sendStart();
         void sendStop();
         void sendByte(uint8_t byte);

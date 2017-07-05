@@ -61,8 +61,9 @@ void Quad::QuadMgr::start()
     _delay_ms(2000);
     ledMgr.toggle(LED::BLUE);
 
-    twiMgr.writeByte(0x68, 0, 0);
-    //twiMgr.request_read(0x68, 0x75);
+    twiMgr.writeByte(0x68, 0x6B, 1);
+
+    ledMgr.toggle(LED::RED);
 
     //// init
     //for (uint8_t i = 0; i < 128U; i++) {

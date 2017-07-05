@@ -7,6 +7,7 @@ extern "C" {
 #include <util/twi.h>
 }
 
+#include "Registers.h"
 #include "TwiMgr.h"
 
 // TODO move to common file
@@ -98,51 +99,6 @@ twi::TwiMgr &twi::TwiMgr::reference( void )
 //    return writeBytes(devAddr, regAddr, 1, &data);
 //}
 //
-///** Write multiple bytes to an 8-bit device register.
-// * @param devAddr I2C slave device address
-// * @param regAddr First register address to write to
-// * @param length Number of bytes to write
-// * @param data Buffer to copy new data from
-// * @return Status of operation (true = success)
-// */
-//bool twi::TwiMgr::writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t* data)
-//{
-//    int8_t count = 0;
-//    uint8_t buf[128];
-//    //int fd;
-//
-//    //if (length > 127) {
-//    //    fprintf(stderr, "Byte write count (%d) > 127\n", length);
-//    //    return(FALSE);
-//    //}
-//
-//    //fd = open("/dev/i2c-1", O_RDWR);
-//    //if (fd < 0) {
-//    //    fprintf(stderr, "Failed to open device: %s\n", strerror(errno));
-//    //    return(FALSE);
-//    //}
-//    //if (ioctl(fd, I2C_SLAVE, devAddr) < 0) {
-//    //    fprintf(stderr, "Failed to select device: %s\n", strerror(errno));
-//    //    close(fd);
-//    //    return(FALSE);
-//    //}
-//    //buf[0] = regAddr;
-//    //memcpy(buf+1,data,length);
-//    //count = write(fd, buf, length+1);
-//    //if (count < 0) {
-//    //    fprintf(stderr, "Failed to write device(%d): %s\n", count, ::strerror(errno));
-//    //    close(fd);
-//    //    return(FALSE);
-//    //} else if (count != length+1) {
-//    //    fprintf(stderr, "Short write to device, expected %d, got %d\n", length+1, count);
-//    //    close(fd);
-//    //    return(FALSE);
-//    //}
-//    //close(fd);
-//
-//    return false;
-//}
-//
 /** Read single byte from an 8-bit device register.
  * @param devAddr I2C slave device address
  * @param regAddr Register regAddr to read from
@@ -155,54 +111,25 @@ int8_t twi::TwiMgr::readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, ui
     return readBytes(devAddr, regAddr, 1, data, timeout);
 }
 
-///** Read multiple bytes from an 8-bit device register.
-// * @param devAddr I2C slave device address
-// * @param regAddr First register regAddr to read from
-// * @param length Number of bytes to read
-// * @param data Buffer to store read data in
-// * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
-// * @return Number of bytes read (-1 indicates failure)
-// */
-//int8_t twi::TwiMgr::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, uint16_t timeout)
-//{
-//    int8_t count = 0;
-//    //int fd = open("/dev/i2c-1", O_RDWR);
-//
-//    //if (fd < 0) {
-//    //    fprintf(stderr, "Failed to open device: %s\n", strerror(errno));
-//    //    return(-1);
-//    //}
-//    //if (ioctl(fd, I2C_SLAVE, devAddr) < 0) {
-//    //    fprintf(stderr, "Failed to select device: %s\n", strerror(errno));
-//    //    close(fd);
-//    //    return(-1);
-//    //}
-//    //if (write(fd, &regAddr, 1) != 1) {
-//    //    fprintf(stderr, "Failed to write reg: %s\n", strerror(errno));
-//    //    close(fd);
-//    //    return(-1);
-//    //}
-//    //count = read(fd, data, length);
-//    //if (count < 0) {
-//    //    fprintf(stderr, "Failed to read device(%d): %s\n", count, ::strerror(errno));
-//    //    close(fd);
-    //    return(-1);
-    //} else if (count != length) {
-    //    fprintf(stderr, "Short read  from device, expected %d, got %d\n", length, count);
-    //    close(fd);
-    //    return(-1);
-    //}
-    //close(fd);
-
-//    return -1;
-//}
 
 bool twi::TwiMgr::isIdle()
 {
-    while ((TWCR & (1 << TWINT)) == 0)
-        //comms.putChar(1);
-        ;
+    if ( (TWCR & _BV(TWINT)) == 0 )
+        return false;
     return true;
+   // while ((TWCR & (1 << TWINT)) == 0)
+   //     //comms.putChar(1);
+   //     ;
+   // return true;
+}
+
+void twi::TwiMgr::waitUntilIdle()
+{
+    uint8_t tries = 0;
+     while ((TWCR & (1 << TWINT)) == 0) {
+         if (++tries % 10 == 0)
+            ground_.sendRegister(registers::TWI_CONTROL, TWCR);
+     }
 }
 
 void twi::TwiMgr::sendStart()
@@ -226,41 +153,6 @@ void twi::TwiMgr::sendSlaW(uint8_t address)
     TWDR = address << 1;
     TWCR = _BV(TWINT) | _BV(TWEN);
 }
-
-//void twi::TwiMgr::test_read(uint8_t addr)
-//{
-//    sendStart();
-//    isIdle();
-//
-//    uint8_t status = 0x00;
-//
-//    while (status != 0x40) {
-//        status = TWI_STATUS;
-//        comms.putChar(status);
-//        switch (TWSR)
-//        {
-//            case 0x08:
-//            case 0x10:
-//                sendSlaR(addr);
-//                comms.putChar(0xAA);
-//                break;
-//            case 0x40:
-//                comms.putChar(0x42);
-//                break;
-//            case 0x48:
-//                TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWSTO);  // send a stop
-//                //sendStart();
-//                //repeatedStart();
-//                comms.putChar(0xBB);
-//                return;
-//                break;
-//            default:
-//                comms.putChar(0xEE);
-//                break;
-//        }
-//        isIdle();
-//    }
-//}
 
 void twi::TwiMgr::request_read(uint8_t addr, uint8_t reg)
 {
@@ -308,14 +200,6 @@ void twi::TwiMgr::request_read(uint8_t addr, uint8_t reg)
     // 0x2d
     print_status();
 }
-
-//void twi::TwiMgr::print_status()
-//{
-//    comms.putChar(TWCR);
-//    comms.putChar(TWSR & 0xF8);
-//    comms.putChar(TWDR);
-//    comms.putChar('-');
-//}
 
 //uint8_t twi::TwiMgr::i2c_start(uint8_t address)
 //{
@@ -411,6 +295,27 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
                             uint8_t timeout)
 {
     sendStart();
+    waitUntilIdle();
+    sendStatus();
+
+    sendSlaW(devAddr);
+    waitUntilIdle();
+    sendStatus();
+
+    sendByte(regAddr);
+    ground_.sendString("Waiting for response");
+    waitUntilIdle();
+    sendStatus();
+
+    sendByte(data);
+    waitUntilIdle();
+    sendStatus();
+
+    sendStop();
+    waitUntilIdle();
+    sendStatus();
+
+    return true;
 
     // Wait for a response
     while ( timeout-- > 0 && !isIdle() )
@@ -442,14 +347,17 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
         sendSlaW(devAddr);
     }
 
-    if (TWSR == TX_MODE_ADDR_ACK) {
+    if (TWI_STATUS == TX_MODE_ADDR_ACK) {
+        ground_.sendString("Here");
         sendByte(regAddr);
 
         // Wait for a response
         while ( timeout-- > 0 && !isIdle() )
             ;
 
-        if (TWSR == TX_MODE_DATA_ACK)
+        sendStatus();
+
+        if (TWI_STATUS == TX_MODE_DATA_ACK)
         {
             // successful RA transmittion
         }
@@ -460,10 +368,14 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
         while ( timeout-- > 0 && !isIdle() )
             ;
 
-        if (TWSR == TX_MODE_DATA_ACK)
+        sendStatus();
+
+        if (TWI_STATUS == TX_MODE_DATA_ACK)
         {
             sendStop();
         }
+
+        sendStatus();
 
         return true;
     }
@@ -477,3 +389,4 @@ void twi::TwiMgr::sendStatus()
 {
     ground_.sendTwiMessage( TWI_STATUS );
 }
+
