@@ -115,6 +115,7 @@ TWI_MESSAGES = dict([
     ])
 
 REGISTERS = dict([
+    (0xB9, 'TWSR'),
     (0xBC, 'TWCR')
 ])
 
@@ -141,17 +142,18 @@ class Receiver:
                 pass
             elif hasattr(self, mode):
                 self.mode = mode
-                packet = self.get_packet()
+                # print("Mode {}".format(mode))
+                #packet = self.get_packet()
 
-                if packet is None:
-                    logging.warning("Failed to receive packet")
-                else:
-                    data = packet.data
-                    getattr(self, mode)(data)
+                #if packet is None:
+                #    logging.warning("Failed to receive packet")
+                #else:
+                #    data = packet.data
+                getattr(self, mode)()
             else:
                 logging.warning("Could not find mode {}".format(mode))
 
-    def get_packet(self):
+    def get_packet(self, size=None):
         """
         Receive the data section of the packet
         :return: Data section of packet received. None if we timedout before 'end' was recieved
@@ -161,14 +163,28 @@ class Receiver:
 
         # Get data
         b = self.get_byte()
-        while b != self.modes['end']:
-            # Timeout after 5 milliseconds of looking for 'end'
-            # Tested with the string 'Hello'. It took about 1.5 milliseconds to receive
-            if time.time() - start > 0.005:
-                logging.warning("Timed out while getting data in mode {}".format(self.mode))
-                return None
-            data.append(b)
-            b = self.get_byte()
+        data.append(b)
+
+        # Fixed packet size
+        if size is not None:
+            size -= 1
+            while size > 0:
+                size -= 1
+                if time.time() - start > 0.005:
+                    logging.warning("Timed out while getting data in mode {}".format(self.mode))
+                    return None
+                b = self.get_byte()
+                data.append(b)
+
+        else:  # String or other variable packet length
+            while b != self.modes['end']:
+                # Timeout after 5 milliseconds of looking for 'end'
+                # Tested with the string 'Hello'. It took about 1.5 milliseconds to receive
+                if time.time() - start > 0.015:
+                    logging.warning("Timed out while getting data in mode {}".format(self.mode))
+                    return None
+                b = self.get_byte()
+                data.append(b)
 
         # Calculate and compare checksum
         checksum = get_checksum(data[0:-1])
@@ -184,25 +200,27 @@ class Receiver:
         d = connection.read(1)
         if len(d) > 0:
             self.num_bytes += 1
-            # print(self.num_bytes)
             b = struct.unpack('B', d)[0]
-            print("received {}".format(b))
+            # print("received {}".format(b))
             return b
 
     def test(self, data):
         print(data)
 
-    def end(self, data):
+    def end(self):
         logging.info("Received null character")
 
-    def start(self, data):
+    def start(self):
         logging.warning("Received start character but ended up here ...")
 
-    def string(self, data):
-        s = ''.join([chr(b) for b in data])
+    def string(self):
+        packet = self.get_packet()
+        s = ''.join([chr(b) for b in packet.data])
         log_message("(string) {}".format(s))
 
-    def register(self, data):
+    def register(self):
+        packet = self.get_packet(3)
+        data = packet.data
         if len(data) != 2:
             logging.warning("\n Received unexpected number of bytes in register mode"
                             "\n {} instead of 2 bytes".format(len(data)))
@@ -210,17 +228,18 @@ class Receiver:
         if len(data) >= 2:
             log_message("(register {}) {}".format(REGISTERS[data[0]], data[1]))
 
-    def twi_msg(self, data):
+    def twi_msg(self):
+        packet = self.get_packet(2)
+        data = packet.data
         if len(data) > 1:
-            logging.warning("Received more than 1 byte in twi_msg mode")
+            logging.warning("Received more than 1 data byte in twi_msg mode")
         twi_mode = data[0]  # We should only have 1 byte
         try:
             log_message("(twi_msg) {}".format(TWI_MESSAGES[twi_mode]))
-        except KeyError as err:
+        except KeyError:
             logging.warning("Couldn't find TWI message {}".format(hex(twi_mode)))
 
     def hunting(self):
-        #while True:
         b = self.get_byte()
         if b in self.modes.values():
             return self._mode_to_string[b]

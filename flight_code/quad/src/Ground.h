@@ -32,6 +32,7 @@ namespace ground {
         void sendRegister(registers::Address register, uint8_t value);
         void sendString(const char* string);
         void sendTwiMessage(uint8_t twi_message);
+        void test();
     private:
         Ground();
 

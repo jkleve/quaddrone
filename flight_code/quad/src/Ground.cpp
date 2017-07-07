@@ -65,3 +65,10 @@ void ground::Ground::sendString(const char* string)
 
     free(data);
 }
+
+void ground::Ground::test()
+{
+    sendString("Hello World");
+    sendTwiMessage(0x08);
+    sendRegister(registers::TWI_CONTROL, 0x00);
+}
