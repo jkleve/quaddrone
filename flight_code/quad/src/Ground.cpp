@@ -45,7 +45,7 @@ void ground::Ground::sendString(const char* string)
     uint8_t packetLength = HEADER_LEN + nData + 1;
 
     // nData + 1 so we can put the string size in the data section of the packet
-    uint8_t* packet = (uint8_t*) malloc( sizeof(uint8_t) * packetLength );
+    uint8_t* packet = (uint8_t*) malloc( sizeof(uint8_t) * packetLength ); // TODO make buffer instead of malloc
 
     // Copy the header into the packet
     packet[0] = STRING;
