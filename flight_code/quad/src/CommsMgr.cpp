@@ -55,17 +55,13 @@ uint8_t comms::CommsMgr::getChar(void)
     return byte;
 }
 
-void comms::CommsMgr::sendMessage(const ground::Message message)
+void comms::CommsMgr::sendMessage(const uint8_t* data, uint8_t nData)
 {
-    putChar(message.msgType);
-
-    for (uint8_t i = 0; i < message.nData; i++) {
-        putChar(message.data[i]);
+    for (uint8_t i = 0; i < nData; i++) {
+        putChar(data[i]);
     }
 
-    putChar( getChecksum(message.data, message.nData) );
-
-    putChar(END_PACKET);
+    putChar( getChecksum(data, nData) );
 }
 
 uint8_t comms::CommsMgr::getChecksum(const uint8_t* data, uint8_t nData)

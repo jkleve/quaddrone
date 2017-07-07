@@ -13,7 +13,7 @@ import time
 from threading import Thread
 from PyQt4 import QtGui, QtCore
 
-Packet = namedtuple('Packet', 'data checksum')
+Packet = namedtuple('Packet', 'mode data checksum valid')
 
 # Create a new log level
 MESSAGE_LOG_LEVEL = 25
@@ -119,6 +119,10 @@ REGISTERS = dict([
     (0xBC, 'TWCR')
 ])
 
+CHECKSUM_LEN = 1
+TWI_MSG_LEN = 1
+REGISTER_LEN = 2
+
 
 class Receiver:
     modes = {
@@ -138,22 +142,30 @@ class Receiver:
     def run(self):
         while not exit_threads:
             mode = self.hunting()
-            if mode is None:  # We didn't get a mode, continue hunting
+            if mode is None:  # We didn't get a header, continue hunting
                 pass
             elif hasattr(self, mode):
-                self.mode = mode
-                # print("Mode {}".format(mode))
-                #packet = self.get_packet()
-
-                #if packet is None:
-                #    logging.warning("Failed to receive packet")
-                #else:
-                #    data = packet.data
-                getattr(self, mode)()
+                self.mode = mode  # TODO needed?
+                getattr(self, mode)(self.modes[mode])
             else:
                 logging.warning("Could not find mode {}".format(mode))
 
-    def get_packet(self, size=None):
+    def assemble_packet(self, header, data):
+        """Create the Packet object and check the checksum
+        header: the mode
+        data: data and checksum. Checksum is the last byte
+        """
+
+        # Append header to front and calculate and compare checksum
+        checksum = get_checksum([header] + data[0:-1])
+
+        if checksum != data[-1]:
+            logging.warning("\n Received bad checksum (calculated {} != {})"
+                            "\n with data {}".format(checksum, data[-1], data[0:-1]))
+            return Packet(header, data[0:-1], checksum, False)
+        return Packet(header, data[0:-1], checksum, True)
+
+    def get_data(self, size=None):
         """
         Receive the data section of the packet
         :return: Data section of packet received. None if we timedout before 'end' was recieved
@@ -161,40 +173,24 @@ class Receiver:
         start = time.time()
         data = list()
 
+        # Add checksum size to number of bytes to receive
+        size += CHECKSUM_LEN
+
         # Get data
         b = self.get_byte()
         data.append(b)
+        size -= 1
 
-        # Fixed packet size
-        if size is not None:
+        while size > 0:
+            if time.time() - start > 0.010:
+                logging.warning("Timed out while getting data in mode {}".format(self.mode))
+                return None
+
+            b = self.get_byte()
+            data.append(b)
             size -= 1
-            while size > 0:
-                size -= 1
-                if time.time() - start > 0.005:
-                    logging.warning("Timed out while getting data in mode {}".format(self.mode))
-                    return None
-                b = self.get_byte()
-                data.append(b)
 
-        else:  # String or other variable packet length
-            while b != self.modes['end']:
-                # Timeout after 5 milliseconds of looking for 'end'
-                # Tested with the string 'Hello'. It took about 1.5 milliseconds to receive
-                if time.time() - start > 0.015:
-                    logging.warning("Timed out while getting data in mode {}".format(self.mode))
-                    return None
-                b = self.get_byte()
-                data.append(b)
-
-        # Calculate and compare checksum
-        checksum = get_checksum(data[0:-1])
-
-        if checksum != data[-1]:
-            logging.warning("\n Received bad checksum ({} != {})"
-                            "\n Throwing out data {}".format(checksum, data[-1], data[0:-1]))
-            return None
-
-        return Packet(data[0:-1], checksum)
+        return data
 
     def get_byte(self):
         d = connection.read(1)
@@ -204,35 +200,65 @@ class Receiver:
             # print("received {}".format(b))
             return b
 
-    def test(self, data):
-        print(data)
+    def test(self, header):
+        print(self._mode_to_string[header])
 
-    def end(self):
+    def end(self, header):
         logging.info("Received null character")
 
-    def start(self):
+    def start(self, header):
         logging.warning("Received start character but ended up here ...")
 
-    def string(self):
-        packet = self.get_packet()
-        s = ''.join([chr(b) for b in packet.data])
+    def string(self, header):
+        str_len = self.get_byte()
+        data = self.get_data(str_len)
+
+        if data is None:  # Failure
+            return
+
+        data.insert(0, str_len)
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = packet.data
+        s = ''.join([chr(b) for b in data])
         log_message("(string) {}".format(s))
 
-    def register(self):
-        packet = self.get_packet(3)
-        data = packet.data
-        if len(data) != 2:
-            logging.warning("\n Received unexpected number of bytes in register mode"
-                            "\n {} instead of 2 bytes".format(len(data)))
+    def register(self, header):
+        data = self.get_data(REGISTER_LEN)
 
-        if len(data) >= 2:
+        if data is None:  # Failure
+            return
+
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = packet.data
+        if len(data) != REGISTER_LEN:
+            logging.warning("\n Received unexpected number of bytes in register mode"
+                            "\n {} instead of {} bytes".format(len(data), REGISTER_LEN))  # TODO +1 for length?
+
+        if len(data) >= REGISTER_LEN:
             log_message("(register {}) {}".format(REGISTERS[data[0]], data[1]))
 
-    def twi_msg(self):
-        packet = self.get_packet(2)
+    def twi_msg(self, header):
+        data = self.get_data(TWI_MSG_LEN)
+
+        if data is None:  # Failure
+            return
+
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
         data = packet.data
-        if len(data) > 1:
-            logging.warning("Received more than 1 data byte in twi_msg mode")
+        if len(data) > TWI_MSG_LEN:
+            logging.warning("Received more than {} data byte(s) in twi_msg mode".format(TWI_MSG_LEN))
         twi_mode = data[0]  # We should only have 1 byte
         try:
             log_message("(twi_msg) {}".format(TWI_MESSAGES[twi_mode]))

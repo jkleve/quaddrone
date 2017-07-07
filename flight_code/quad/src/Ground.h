@@ -14,6 +14,10 @@ namespace comms {
 
 namespace ground {
 
+    static const uint8_t HEADER_LEN = 1;
+    static const uint8_t TWI_MSG_LEN = HEADER_LEN + 1;
+    static const uint8_t REGISTER_MSG_LEN = HEADER_LEN + 2;
+
     enum MsgType {
         STRING = 0xff,
         TWI_MESSAGE = 0xfe,

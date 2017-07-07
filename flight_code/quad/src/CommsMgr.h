@@ -7,8 +7,6 @@
 
 #include <stdint.h>
 
-#include "Ground.h"
-
 namespace ground {
     struct Message;
 }
@@ -22,7 +20,7 @@ namespace comms {
     class CommsMgr {
     public:
         static CommsMgr& reference();
-        void sendMessage(const ground::Message message);
+        void sendMessage(const uint8_t* data, uint8_t nData);
     private:
         CommsMgr();
         uint8_t getChar(void);
