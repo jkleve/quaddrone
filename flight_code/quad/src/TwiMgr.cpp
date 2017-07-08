@@ -125,10 +125,10 @@ bool twi::TwiMgr::isIdle()
 
 void twi::TwiMgr::waitUntilIdle()
 {
-    uint8_t tries = 0;
+    //uint8_t tries = 0;
      while ((TWCR & (1 << TWINT)) == 0) {
-         if (++tries % 100 == 0)
-            ground_.sendRegister(registers::TWI_CONTROL, TWCR);
+         //if (++tries % 100 == 0)
+         //   ground_.sendRegister(registers::TWI_CONTROL, TWCR);
      }
     ground_.sendRegister(registers::TWI_CONTROL, TWCR);
     ground_.sendRegister(registers::REG_TWI_STATUS, TWSR);
@@ -296,6 +296,8 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
                             uint8_t data,
                             uint8_t timeout)
 {
+    timeout = 100;
+
     sendStart();
     waitUntilIdle();
     sendStatus();
@@ -306,6 +308,22 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
 
     sendByte(regAddr);
     ground_.sendString("Waiting for response");
+    while (!isIdle() && timeout > 0)
+        timeout++;
+    //waitUntilIdle();
+
+    if (!isIdle()) {
+        sendStart();
+        waitUntilIdle();
+        sendStatus();
+
+        sendSlaW(devAddr);
+        waitUntilIdle();
+        sendStatus();
+
+        sendByte(regAddr);
+    }
+
     waitUntilIdle();
     sendStatus();
 

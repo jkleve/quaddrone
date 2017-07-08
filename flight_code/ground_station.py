@@ -222,7 +222,7 @@ class Receiver:
         if packet.valid is False:  # Failure
             return
 
-        data = packet.data
+        data = packet.data[1:]  # Get the data, excluding the str_len
         s = ''.join([chr(b) for b in data])
         log_message("(string) {}".format(s))
 
