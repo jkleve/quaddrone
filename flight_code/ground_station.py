@@ -7,6 +7,7 @@ from ctypes import *
 from errno import EACCES, EPERM
 import logging
 import serial
+from serial.serialutil import SerialException
 import struct
 import sys
 import time
@@ -193,7 +194,16 @@ class Receiver:
         return data
 
     def get_byte(self):
-        d = connection.read(1)
+        try:
+            d = connection.read(1)
+        except SerialException:
+            logging.critical("")  # Add some extra emphasis
+            logging.critical("Device disconnected. Exiting ...")
+
+            global exit_threads
+            exit_threads = True
+            sys.exit(1)
+
         if len(d) > 0:
             self.num_bytes += 1
             b = struct.unpack('B', d)[0]
@@ -322,9 +332,12 @@ if __name__ == '__main__':
     try:
         while True:
             time.sleep(.1)
+            if exit_threads is True:
+                break
     except (KeyboardInterrupt, SystemExit):
         print("")  # Print a newline character
         logging.info("Caught keyboard interrupt")
+    finally:
         # Tell threads to exit
         exit_threads = True
         # Wait for threads to exit
