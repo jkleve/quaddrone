@@ -116,6 +116,7 @@ TWI_MESSAGES = dict([
     ])
 
 REGISTERS = dict([
+    (0xB8, 'TWBR'),
     (0xB9, 'TWSR'),
     (0xBC, 'TWCR')
 ])
@@ -300,25 +301,33 @@ def gui():
     sys.exit(app.exec_())
 
 
-
 if __name__ == '__main__':
+    timeout = 10  # Seconds
+    start_time = time.time()
     ports = ['/dev/ttyACM0', '/dev/ttyACM1', '/dev/ttyACM2', '/dev/ttyUSB0']
-    for port in ports:
-        try:
-            connection = serial.Serial(port=port,
-                                       baudrate=38400,
-                                       bytesize=serial.EIGHTBITS,
-                                       parity=serial.PARITY_NONE,
-                                       stopbits=serial.STOPBITS_ONE,
-                                       timeout=2)
-        except Exception as e:
-            # Check if the exception was due to sudo permissions
-            if e.errno == EPERM or e.errno == EACCES:
-                logging.error("Need sudo permissions")
-                break
-        else:
-            logging.info("Connected on {}".format(port))
+
+    logging.info("Attempting to connect to device")
+    while connection is None:
+        if time.time() - start_time > timeout:
+            logging.error("Timed out")
             break
+
+        for port in ports:
+            try:
+                connection = serial.Serial(port=port,
+                                           baudrate=38400,
+                                           bytesize=serial.EIGHTBITS,
+                                           parity=serial.PARITY_NONE,
+                                           stopbits=serial.STOPBITS_ONE,
+                                           timeout=2)  # This timeout is for if the port actually exists
+            except Exception as e:
+                # Check if the exception was due to sudo permissions
+                if e.errno == EPERM or e.errno == EACCES:
+                    logging.error("Need sudo permissions")
+                    sys.exit(1)
+            else:
+                logging.info("Connected on {}".format(port))
+                break
 
     if connection is None:
         logging.critical("Couldn't connect to device on any port")
