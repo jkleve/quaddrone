@@ -309,11 +309,11 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
     sendByte(regAddr);
     ground_.sendString("Waiting for response");
     while (!isIdle() && timeout > 0)
-        timeout++;
+        timeout--;
     //waitUntilIdle();
 
     if (!isIdle()) {
-        sendStart();
+        sendStart(); // Send repeated start
         waitUntilIdle();
         sendStatus();
 
@@ -324,7 +324,10 @@ bool twi::TwiMgr::writeByte(uint8_t devAddr,
         sendByte(regAddr);
     }
 
-    waitUntilIdle();
+    ground_.sendString("Waiting for response");
+    while (!isIdle() && timeout > 0)
+        timeout--;
+    //waitUntilIdle();
     sendStatus();
 
     sendByte(data);
