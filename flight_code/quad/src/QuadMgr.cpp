@@ -36,7 +36,9 @@ void Quad::QuadMgr::start()
 
     _delay_ms(1000);
 
-    twiMgr.writeByte(0x68, 0x6B, 1);
+
+
+    //twiMgr.writeByte(0x68, 0x6B, 1);
 
     ledMgr.toggle(LED::RED);
 

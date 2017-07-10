@@ -128,10 +128,10 @@ void twi::TwiMgr::waitUntilIdle()
     //uint8_t tries = 0;
      while ((TWCR & (1 << TWINT)) == 0) {
          //if (++tries % 100 == 0)
-         //   ground_.sendRegister(registers::TWI_CONTROL, TWCR);
+         //   ground_.sendRegister(reg::TWI_CONTROL, TWCR);
      }
-    ground_.sendRegister(registers::TWI_CONTROL, TWCR);
-    ground_.sendRegister(registers::REG_TWI_STATUS, TWSR);
+    ground_.sendRegister(reg::TWI_CONTROL, TWCR);
+    ground_.sendRegister(reg::REG_TWI_STATUS, TWSR);
 }
 
 void twi::TwiMgr::sendStart()

@@ -116,6 +116,14 @@ TWI_MESSAGES = dict([
     ])
 
 REGISTERS = dict([
+    (0x90, 'TCCR3A'),
+    (0x91, 'TCCR3B'),
+    (0x92, 'TCCR3C'),
+    (0x94, 'TCNT3'),
+    (0x96, 'ICR3'),
+    (0x98, 'OCR3A'),
+    (0x9A, 'OCR3B'),
+    (0x9C, 'OCR3C'),
     (0xB8, 'TWBR'),
     (0xB9, 'TWSR'),
     (0xBC, 'TWCR')

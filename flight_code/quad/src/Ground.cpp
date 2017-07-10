@@ -19,7 +19,7 @@ ground::Ground& ground::Ground::reference()
     return ref;
 }
 
-void ground::Ground::sendRegister(registers::Address reg, uint8_t value)
+void ground::Ground::sendRegister(reg::Address reg, uint8_t value)
 {
     uint8_t data[REGISTER_MSG_LEN];
     data[0] = REGISTER;
@@ -66,5 +66,5 @@ void ground::Ground::test()
 {
     sendString("Hello World");
     sendTwiMessage(0x08);
-    sendRegister(registers::TWI_CONTROL, 0x00);
+    sendRegister(reg::TWI_CONTROL, 0x00);
 }
