@@ -10,13 +10,20 @@
 namespace reg {
     enum Address {
         // Timer interrupt flag registers
-        TIMER3_INT_FLAGS = 0x18,
+        TIMER0_INT_FLAGS = 0x35, // TIFR0
+        TIMER1_INT_FLAGS = 0x36, // TIFR1
+        TIMER2_INT_FLAGS = 0x37, // TIFR2
+        TIMER3_INT_FLAGS = 0x38, // TIFR3
+        TIMER4_INT_FLAGS = 0x39, // TIFR4
+        TIMER5_INT_FLAGS = 0x3A, // TIFR5
 
         // Timer mask registers
         TIMER0_INT_MASK = 0x6E, // TIMSK0
         TIMER1_INT_MASK = 0x6F, // TIMSK1
         TIMER2_INT_MASK = 0x70, // TIMSK2
         TIMER3_INT_MASK = 0x71, // TIMSK3
+        TIMER4_INT_MASK = 0x72, // TIMSK4
+        TIMER5_INT_MASK = 0x73, // TIMSK5
 
         // Timer 3 registers
         TIMER3_CONTROL_A        = 0x90, // TCCR3A

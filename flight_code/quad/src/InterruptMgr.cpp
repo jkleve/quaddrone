@@ -12,7 +12,7 @@ Quad::InterruptMgr::InterruptMgr() :
     quadState( QuadState::reference() ),
     timer0( Timer0::reference() ),
     timer1( Timer1::reference() ),
-    ledMgr( LED::LedMgr::reference() ),
+    ledMgr( led::LedMgr::reference() ),
     eepromMgr( Eeprom::EepromMgr::reference() )
 {
     // timer 1 (1 Hz)

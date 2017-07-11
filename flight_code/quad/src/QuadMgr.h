@@ -12,6 +12,7 @@
 #include "Ground.h"
 //#include "I2CDriver.h"
 #include "LedMgr.h"
+#include "Timer.h"
 #include "TwiMgr.h"
 
 namespace Quad {
@@ -23,8 +24,8 @@ namespace Quad {
         QuadMgr();
         void start();
     private:
-        LED::LedMgr& ledMgr;
-        comms::CommsMgr& commsMgr;
+        led::LedMgr& ledMgr;
+        comms::CommsMgr& commsMgr; // TODO make comms interface with usart class
         QuadState& quadState;
         InterruptMgr& interruptMgr;
         Eeprom::EepromMgr& eepromMgr;
@@ -33,6 +34,16 @@ namespace Quad {
 
         void loop();
 
+        // TODO timer0
+        // TODO timer1
+        // TODO timer2
+        timer::Timer16 timer3_;
+        // TODO timer4
+        // TODO timer5
+        // TODO motor front_star
+        // TODO motor front_port
+        // TODO motor back_start
+        // TODO motor back_port
         ground::Ground& ground_;
     };
 }
