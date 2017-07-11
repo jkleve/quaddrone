@@ -28,10 +28,7 @@ twi::TwiMgr::TwiMgr() :
     sbi(PORTD, 1);
 
     // Set prescalar to 1 (0x00)
-    //TWSR = 0;
-    cbi(TWSR, TWPS0);
-    cbi(TWSR, TWPS1);
-    //TWSR |= (0 << TWPS1) | (0 << TWPS0);
+    TWSR = 0;
 
     // enable twi
     TWCR = _BV(TWEN);
