@@ -354,9 +354,9 @@ if __name__ == '__main__':
     except (KeyboardInterrupt, SystemExit):
         print("")  # Print a newline character
         logging.info("Caught keyboard interrupt")
-    finally:
         # Tell threads to exit
         exit_threads = True
+    finally:
         # Wait for threads to exit
         listening_thread.join()
         sys.exit(0)

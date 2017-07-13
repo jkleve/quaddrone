@@ -15,12 +15,12 @@ timer::Timer3::Timer3() :
              reg::TIMER3_INPUT_CAPTURE,
              reg::TIMER3_OUTPUT_COMPARE_A,
              reg::TIMER3_OUTPUT_COMPARE_B,
-             reg::TIMER3_OUTPUT_COMPARE_C ),
+             reg::TIMER3_OUTPUT_COMPARE_C,
+             reg::TIMER3_INT_FLAGS,
+             reg::TIMER3_INT_MASK ),
     ground_( ground::Ground::reference() )
 {
-    _SFR_MEM8(control_a_reg8_) = _BV(WGM31);
-    _SFR_MEM8(control_b_reg8_) = _BV(WGM33) | _BV(WGM32);
-
-    ground_.sendRegister(reg::TIMER3_CONTROL_A, TCCR3A);
-    ground_.sendRegister(reg::TIMER3_CONTROL_B, TCCR3B);
+    ground_.sendRegister(reg::TIMER3_CONTROL_A, control_a_reg8_);
+    ground_.sendRegister(reg::TIMER3_CONTROL_B, control_b_reg8_);
+    ground_.sendRegister(reg::TIMER3_CONTROL_C, control_c_reg8_);
 }

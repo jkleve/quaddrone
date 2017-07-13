@@ -15,7 +15,7 @@ led::LedMgr::LedMgr() {
     PORTA = 0xFF; // turn all pins off
 }
 
-LED::LedMgr &led::LedMgr::reference( void ) {
+led::LedMgr &led::LedMgr::reference( void ) {
     static LedMgr ref;
     return ref;
 }

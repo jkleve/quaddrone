@@ -37,8 +37,22 @@ void Quad::QuadMgr::start()
     ground_.sendString("Done Testing");
 
     _delay_ms(1000);
+    ledMgr.toggle(led::BLUE);
 
+    timer3_.setNormalMode();
+    timer3_.disableOutputCompare();
+    timer3_.setPrescaler(timer::Prescaler::PRESCALE256); // TODO
+    timer3_.setMs(1000);
+    timer3_.start();
 
+    while (true) {
+        if (timer3_.check()) {
+            ledMgr.toggle(led::YELLOW);
+            ground_.sendString("Interrupt ...");
+            timer3_.reset();
+        }
+        //ground_.sendRegister(reg::TIMER3_COUNTER, TCNT3);
+    }
 
     //twiMgr.writeByte(0x68, 0x6B, 1);
 
