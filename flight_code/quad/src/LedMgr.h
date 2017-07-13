@@ -6,7 +6,7 @@
 #define EEPROM_CMAKE_TEST_LEDMGR_H
 
 
-namespace LED {
+namespace led {
 
     enum LED {
         RED,

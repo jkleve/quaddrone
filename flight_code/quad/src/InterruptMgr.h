@@ -23,7 +23,7 @@ namespace Quad {
             QuadState& quadState;
             Timer0& timer0;
             Timer1& timer1;
-            LED::LedMgr& ledMgr;
+            led::LedMgr& ledMgr;
             Eeprom::EepromMgr& eepromMgr;
     };
 }

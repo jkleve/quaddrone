@@ -7,7 +7,7 @@ extern "C" {
 }
 #include "LedMgr.h"
 
-LED::LedMgr::LedMgr() {
+led::LedMgr::LedMgr() {
     // BLUE:   0x08 PA3
     // YELLOW: 0x10 PA4
     // RED:    0x20 PA5
@@ -15,12 +15,12 @@ LED::LedMgr::LedMgr() {
     PORTA = 0xFF; // turn all pins off
 }
 
-LED::LedMgr &LED::LedMgr::reference( void ) {
+led::LedMgr &led::LedMgr::reference( void ) {
     static LedMgr ref;
     return ref;
 }
 
-void LED::LedMgr::toggle( LED light )
+void led::LedMgr::toggle( LED light )
 {
     switch( light )
     {
@@ -38,7 +38,7 @@ void LED::LedMgr::toggle( LED light )
     }
 }
 
-void LED::LedMgr::on( LED light )
+void led::LedMgr::on( LED light )
 {
     switch( light )
     {
@@ -56,7 +56,7 @@ void LED::LedMgr::on( LED light )
     }
 }
 
-void LED::LedMgr::off( LED light )
+void led::LedMgr::off( LED light )
 {
     switch( light )
     {

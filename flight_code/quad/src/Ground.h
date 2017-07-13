@@ -33,7 +33,7 @@ namespace ground {
     class Ground {
     public:
         static Ground& reference();
-        void sendRegister(registers::Address register, uint8_t value);
+        void sendRegister(reg::Address register, uint8_t value);
         void sendString(const char* string);
         void sendTwiMessage(uint8_t twi_message);
         void test();

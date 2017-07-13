@@ -9,14 +9,16 @@ extern "C" {
 }
 
 #include "QuadMgr.h"
+#include "Timer3.h"
 
 Quad::QuadMgr::QuadMgr() :
-    ledMgr( LED::LedMgr::reference() ),
+    ledMgr( led::LedMgr::reference() ),
     commsMgr( comms::CommsMgr::reference() ),
     quadState( Quad::QuadState::reference() ),
     interruptMgr( Quad::InterruptMgr::reference() ),
     eepromMgr( Eeprom::EepromMgr::reference() ),
     twiMgr( twi::TwiMgr::reference() ),
+    timer3_( timer::Timer3() ),
     ground_( ground::Ground::reference() )
 	//i2cDriver( i2c::AVRI2CDriver() )
 {
@@ -28,17 +30,33 @@ Quad::QuadMgr::QuadMgr() :
 void Quad::QuadMgr::start()
 {
 
-    ledMgr.toggle(LED::BLUE);
+    ledMgr.toggle(led::BLUE);
 
     ground_.sendString("Testing");
     ground_.test();
     ground_.sendString("Done Testing");
 
     _delay_ms(1000);
+    ledMgr.toggle(led::BLUE);
 
-    twiMgr.writeByte(0x68, 0x6B, 1);
+    timer3_.setNormalMode();
+    timer3_.disableOutputCompare();
+    timer3_.setPrescaler(timer::Prescaler::PRESCALE256); // TODO
+    timer3_.setMs(1000);
+    timer3_.start();
 
-    ledMgr.toggle(LED::RED);
+    while (true) {
+        if (timer3_.check()) {
+            ledMgr.toggle(led::YELLOW);
+            ground_.sendString("Interrupt ...");
+            timer3_.reset();
+        }
+        //ground_.sendRegister(reg::TIMER3_COUNTER, TCNT3);
+    }
+
+    //twiMgr.writeByte(0x68, 0x6B, 1);
+
+    ledMgr.toggle(led::RED);
 
     // loop
     //loop();
@@ -65,7 +83,7 @@ void Quad::QuadMgr::start()
 //
 //        if( quadState.getstate( OneHzTimer ) )
 //        {
-//            ledMgr.toggle( LED::RED );
+//            ledMgr.toggle( led::RED );
 //            quadState.unset(OneHzTimer);
 //        }
 //

@@ -13,8 +13,10 @@ add_avr_executable(
    InterruptMgr.cpp
    LedMgr.cpp
    #Mpu.cpp
-   Timer1.cpp
+   Timer.cpp
    Timer0.cpp
+   Timer1.cpp
+   Timer3.cpp
    TwiMgr.cpp
    #ImuMgr.cpp
    )
