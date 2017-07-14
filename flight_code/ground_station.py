@@ -351,7 +351,7 @@ class Receiver:
             return
 
         data = packet.data
-        log_message("(word) {}".format(data[0]))
+        log_message("(byte) {}".format(data[0]))
 
     def hunting(self):
         b = self.get_byte()
