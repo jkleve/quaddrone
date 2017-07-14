@@ -2,6 +2,7 @@
 # 6/14/16 (CAC)
 # Dummy transmitter for output testing
 
+from argparse import ArgumentParser
 from collections import namedtuple
 from ctypes import *
 from errno import EACCES, EPERM
@@ -18,11 +19,6 @@ Packet = namedtuple('Packet', 'mode data checksum valid')
 
 # Create a new log level
 MESSAGE_LOG_LEVEL = 25
-# Add the newly created log level
-logging.addLevelName(MESSAGE_LOG_LEVEL, "MESSAGE")
-# Set the format for logging and set log level
-logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
-
 
 def log_message(message):
     logging.log(MESSAGE_LOG_LEVEL, message)
@@ -366,7 +362,9 @@ def gui():
     sys.exit(app.exec_())
 
 
-if __name__ == '__main__':
+def main():
+    global connection
+
     timeout = 20  # Seconds
     start_time = time.time()
     ports = ['/dev/ttyACM0', '/dev/ttyACM1', '/dev/ttyACM2', '/dev/ttyUSB0']
@@ -416,4 +414,26 @@ if __name__ == '__main__':
     finally:
         # Wait for threads to exit
         listening_thread.join()
+        sys.exit(0)
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description="Ground station for quadcopter flight code")
+    parser.add_argument('-ms', action='store_true', help="Print time with milli-seconds")
+
+    args = parser.parse_args()
+
+    # Add the newly created log level
+    logging.addLevelName(MESSAGE_LOG_LEVEL, "MESSAGE")
+    # Set the format for logging and set log level
+    if args.ms is True:
+        logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
+    else:
+        logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
+
+    # Run main function until we exit or catch an exception
+    try:
+        main()
+    except (KeyboardInterrupt, SystemExit):
+        logging.info("Exiting")
         sys.exit(0)
