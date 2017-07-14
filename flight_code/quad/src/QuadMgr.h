@@ -10,14 +10,10 @@
 #include "Eeprom.h"
 #include "InterruptMgr.h"
 #include "Ground.h"
-//#include "I2CDriver.h"
 #include "LedMgr.h"
 #include "Timer.h"
-#include "TwiMgr.h"
 
 namespace Quad {
-    //class QuadState;
-    //class InterruptMgr;
 
     class QuadMgr {
     public:
@@ -29,8 +25,6 @@ namespace Quad {
         QuadState& quadState;
         InterruptMgr& interruptMgr;
         Eeprom::EepromMgr& eepromMgr;
-        twi::TwiMgr& twiMgr;
-        //i2c::AVRI2CDriver i2cDriver;
 
         void loop();
 

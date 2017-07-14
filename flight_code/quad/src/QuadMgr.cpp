@@ -19,13 +19,10 @@ Quad::QuadMgr::QuadMgr() :
     quadState( Quad::QuadState::reference() ),
     interruptMgr( Quad::InterruptMgr::reference() ),
     eepromMgr( Eeprom::EepromMgr::reference() ),
-    twiMgr( twi::TwiMgr::reference() ),
     timer3_( timer::Timer3() ),
     ground_( ground::Ground::reference() )
-	//i2cDriver( i2c::AVRI2CDriver() )
 {
 	_delay_ms(1000);
-	//i2cDriver.begin();
     sei();
 }
 
