@@ -18,13 +18,15 @@ namespace ground {
     static const uint8_t TWI_MSG_LEN = HEADER_LEN + 1;
     static const uint8_t REGISTER_MSG_LEN = HEADER_LEN + 4; // lowRegByte, highRegByte, lowByte, highByte
     static const uint8_t WORD_MSG_LEN = HEADER_LEN + 2;
+    static const uint8_t BYTE_MSG_LEN = HEADER_LEN + 1;
 
     enum MsgType {
         STRING      = 0xff,
         TWI_MESSAGE = 0xfe,
         REGISTER    = 0xfd,
         DATA        = 0xfc,
-        WORD        = 0xfb
+        WORD        = 0xfb,
+        BYTE        = 0xfa
     };
 
     struct Message {
@@ -45,6 +47,7 @@ namespace ground {
         void sendTwiMessage(uint8_t twi_message);
         void sendData(uint8_t* data, uint8_t nData);
         void sendWord(uint16_t word);
+        void sendByte(uint8_t byte);
         void test();
     private:
         Ground();

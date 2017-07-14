@@ -48,7 +48,15 @@ void Quad::QuadMgr::start()
     timer5.setPrescaler(timer::PRESCALE256);
 
     I2C i2c(ground_, timer5);
-    i2c.scan();
+    uint8_t response = i2c.read(0x68, 0x75, 1);
+    ground_.sendString("Reading 0x75 from 0x68. Response:");
+    ground_.sendByte(response);
+
+    if (i2c.available()) {
+        ground_.sendString("Received");
+        ground_.sendByte(i2c.receive());
+    }
+    //i2c.scan();
 
     //twiMgr.writeByte(0x68, 0x6B, 1);
 

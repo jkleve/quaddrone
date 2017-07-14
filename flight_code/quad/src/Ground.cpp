@@ -86,6 +86,14 @@ void ground::Ground::sendWord(uint16_t word)
     comms_.sendMessage(buffer_, WORD_MSG_LEN);
 }
 
+void ground::Ground::sendByte(uint8_t byte)
+{
+    buffer_[0] = BYTE;
+    buffer_[1] = byte;
+
+    comms_.sendMessage(buffer_, BYTE_MSG_LEN);
+}
+
 void ground::Ground::test()
 {
     sendString("Hello World");
@@ -99,4 +107,5 @@ void ground::Ground::test()
     sendString("Sending word 31250");
     sendWord(31250);
 }
+
 

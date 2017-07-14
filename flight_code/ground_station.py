@@ -130,6 +130,7 @@ CHECKSUM_LEN = 1
 TWI_MSG_LEN = 1
 REGISTER_LEN = 4
 WORD_LEN = 2
+BYTE_LEN = 1
 
 
 class Receiver:
@@ -139,6 +140,7 @@ class Receiver:
         'register': 0xfd,
         'data': 0xfc,
         'word': 0xfb,
+        'byte': 0xfa,
         'test': 0x48,
         'end': 0x00
     }
@@ -336,6 +338,20 @@ class Receiver:
         data = packet.data
         word = (data[1] << 8) + data[0]
         log_message("(word) {}".format(word))
+
+    def byte(self, header):
+        data = self.get_data(BYTE_LEN)
+
+        if data is None:  # Failure
+            return
+
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = packet.data
+        log_message("(word) {}".format(data[0]))
 
     def hunting(self):
         b = self.get_byte()
