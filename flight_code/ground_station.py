@@ -231,7 +231,7 @@ class Receiver:
 
         if len(d) > 0:
             self.num_bytes += 1
-            b = struct.unpack('B', d)[0]
+            b = struct.unpack('B', d)[0]  # TODO this may be assuming everything is unsigned
             # print("received {}".format(b))
             return b
 
@@ -286,7 +286,7 @@ class Receiver:
             logging.warning("Register {} does not exist."
                             "Data in unknown register: {}".format(hex(register), value))
         else:
-            log_message("(register {}) {}".format(register_name, value))
+            log_message("(register {}) {} ({})".format(register_name, value, hex(value)))
 
     def twi_msg(self, header):
         data = self.get_data(TWI_MSG_LEN)
@@ -351,7 +351,7 @@ class Receiver:
             return
 
         data = packet.data
-        log_message("(byte) {}".format(data[0]))
+        log_message("(byte) {} ({})".format(data[0], hex(data[0])))
 
     def hunting(self):
         b = self.get_byte()

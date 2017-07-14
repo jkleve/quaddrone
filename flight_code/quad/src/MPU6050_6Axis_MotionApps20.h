@@ -324,7 +324,8 @@ const unsigned char dmpUpdates[MPU6050_DMP_UPDATES_SIZE] PROGMEM = {
 
 uint8_t MPU6050::dmpInitialize() {
     // reset device
-    DEBUG_PRINTLN(F("\n\nResetting MPU6050..."));
+    //DEBUG_PRINTLN(F("\n\nResetting MPU6050..."));
+    ground_.sendString("\n\nResetting MPU6050...");
     reset();
     delay(30); // wait after reset
 
@@ -335,88 +336,126 @@ uint8_t MPU6050::dmpInitialize() {
     setWakeCycleEnabled(true);*/
 
     // disable sleep mode
-    DEBUG_PRINTLN(F("Disabling sleep mode..."));
+    //DEBUG_PRINTLN(F("Disabling sleep mode..."));
+    ground_.sendString("Disabling sleep mode...");
     setSleepEnabled(false);
 
     // get MPU hardware revision
-    DEBUG_PRINTLN(F("Selecting user bank 16..."));
+    //DEBUG_PRINTLN(F("Selecting user bank 16..."));
+    ground_.sendString("Selecting user bank 16...");
     setMemoryBank(0x10, true, true);
-    DEBUG_PRINTLN(F("Selecting memory byte 6..."));
+    //DEBUG_PRINTLN(F("Selecting memory byte 6..."));
+    ground_.sendString("Selecting memory byte 6...");
     setMemoryStartAddress(0x06);
-    DEBUG_PRINTLN(F("Checking hardware revision..."));
-    DEBUG_PRINT(F("Revision @ user[16][6] = "));
-    DEBUG_PRINTLNF(readMemoryByte(), HEX);
-    DEBUG_PRINTLN(F("Resetting memory bank selection to 0..."));
+    //DEBUG_PRINTLN(F("Checking hardware revision..."));
+    ground_.sendString("Checking hardware revision...");
+    //DEBUG_PRINT(F("Revision @ user[16][6] = "));
+    ground_.sendString("Revision @ user[16][6] = ");
+    //DEBUG_PRINTLNF(readMemoryByte(), HEX);
+    ground_.sendByte(readMemoryByte());
+    //DEBUG_PRINTLN(F("Resetting memory bank selection to 0..."));
+    ground_.sendString("Resetting memory bank selection to 0...");
     setMemoryBank(0, false, false);
 
     // check OTP bank valid
-    DEBUG_PRINTLN(F("Reading OTP bank valid flag..."));
-    DEBUG_PRINT(F("OTP bank is "));
-    DEBUG_PRINTLN(getOTPBankValid() ? F("valid!") : F("invalid!"));
+    //DEBUG_PRINTLN(F("Reading OTP bank valid flag..."));
+    ground_.sendString("Reading OTP bank valid flag...");
+    //DEBUG_PRINT(F("OTP bank is "));
+    ground_.sendString("OTP bank is ");
+    //DEBUG_PRINTLN(getOTPBankValid() ? F("valid!") : F("invalid!"));
+    ground_.sendString(getOTPBankValid() ? "valid!" : "invalid!")
 
     // get X/Y/Z gyro offsets
-    DEBUG_PRINTLN(F("Reading gyro offset TC values..."));
+    //DEBUG_PRINTLN(F("Reading gyro offset TC values..."));
+    ground_.sendString("Reading gyro offset TC values...");
     int8_t xgOffsetTC = getXGyroOffsetTC();
     int8_t ygOffsetTC = getYGyroOffsetTC();
     int8_t zgOffsetTC = getZGyroOffsetTC();
-    DEBUG_PRINT(F("X gyro offset = "));
-    DEBUG_PRINTLN(xgOffsetTC);
-    DEBUG_PRINT(F("Y gyro offset = "));
-    DEBUG_PRINTLN(ygOffsetTC);
-    DEBUG_PRINT(F("Z gyro offset = "));
-    DEBUG_PRINTLN(zgOffsetTC);
+    //DEBUG_PRINT(F("X gyro offset = "));
+    ground_.sendString("X gyro offset = ");
+    //DEBUG_PRINTLN(xgOffsetTC);
+    ground_.sendByte(xgOffsetTC); // TODO does sendByte work with signed ints?
+    //DEBUG_PRINT(F("Y gyro offset = "));
+    ground_.sendString("Y gyro offset = ");
+    //DEBUG_PRINTLN(ygOffsetTC);
+    ground_.sendByte(ygOffsetTC); // TODO does sendByte work with signed ints?
+    //DEBUG_PRINT(F("Z gyro offset = "));
+    ground_.sendString("Z gyro offset = ");
+    //DEBUG_PRINTLN(zgOffsetTC);
+    ground_.sendByte(zgOffsetTC); // TODO does sendByte work with signed ints?
 
     // setup weird slave stuff (?)
-    DEBUG_PRINTLN(F("Setting slave 0 address to 0x7F..."));
+    //DEBUG_PRINTLN(F("Setting slave 0 address to 0x7F..."));
+    ground_.sendString("Setting slave 0 address to 0x7F...");
     setSlaveAddress(0, 0x7F);
-    DEBUG_PRINTLN(F("Disabling I2C Master mode..."));
+    //DEBUG_PRINTLN(F("Disabling I2C Master mode..."));
+    ground_.sendString("Disabling I2C Master mode...");
     setI2CMasterModeEnabled(false);
-    DEBUG_PRINTLN(F("Setting slave 0 address to 0x68 (self)..."));
+    //DEBUG_PRINTLN(F("Setting slave 0 address to 0x68 (self)..."));
+    ground_.sendString("Setting slave 0 address to 0x68 (self)...");
     setSlaveAddress(0, 0x68);
-    DEBUG_PRINTLN(F("Resetting I2C Master control..."));
+    //DEBUG_PRINTLN(F("Resetting I2C Master control..."));
+    ground_.sendString("Resetting I2C Master control...");
     resetI2CMaster();
     delay(20);
 
     // load DMP code into memory banks
-    DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));
-    DEBUG_PRINT(MPU6050_DMP_CODE_SIZE);
-    DEBUG_PRINTLN(F(" bytes)"));
+    //DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));
+    ground_.sendString("Writing DMP code to MPU memory banks (");
+    //DEBUG_PRINT(MPU6050_DMP_CODE_SIZE);
+    ground_.sendWord(MPU6050_DMP_CODE_SIZE);
+    //DEBUG_PRINTLN(F(" bytes)"));
+    ground_.sendString(" bytes)");
     if (writeProgMemoryBlock(dmpMemory, MPU6050_DMP_CODE_SIZE)) {
-        DEBUG_PRINTLN(F("Success! DMP code written and verified."));
+        //DEBUG_PRINTLN(F("Success! DMP code written and verified."));
+        ground_.sendString("Success! DMP code written and verified.");
 
         // write DMP configuration
-        DEBUG_PRINT(F("Writing DMP configuration to MPU memory banks ("));
-        DEBUG_PRINT(MPU6050_DMP_CONFIG_SIZE);
-        DEBUG_PRINTLN(F(" bytes in config def)"));
+        //DEBUG_PRINT(F("Writing DMP configuration to MPU memory banks ("));
+        ground_.sendString("Writing DMP configuration to MPU memory banks (");
+        //DEBUG_PRINT(MPU6050_DMP_CONFIG_SIZE);
+        ground_.sendByte(MPU6050_DMP_CONFIG_SIZE);
+        //DEBUG_PRINTLN(F(" bytes in config def)"));
+        ground_.sendString(" bytes in config def)");
         if (writeProgDMPConfigurationSet(dmpConfig, MPU6050_DMP_CONFIG_SIZE)) {
-            DEBUG_PRINTLN(F("Success! DMP configuration written and verified."));
+            //DEBUG_PRINTLN(F("Success! DMP configuration written and verified."));
+            ground_.sendString("Success! DMP configuration written and verified.");
 
-            DEBUG_PRINTLN(F("Setting clock source to Z Gyro..."));
+            //DEBUG_PRINTLN(F("Setting clock source to Z Gyro..."));
+            ground_.sendString("Setting clock source to Z Gyro...");
             setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 
-            DEBUG_PRINTLN(F("Setting DMP and FIFO_OFLOW interrupts enabled..."));
+            //DEBUG_PRINTLN(F("Setting DMP and FIFO_OFLOW interrupts enabled..."));
+            ground_.sendString("Setting DMP and FIFO_OFLOW interrupts enabled...");
             setIntEnabled(0x12);
 
-            DEBUG_PRINTLN(F("Setting sample rate to 200Hz..."));
+            //DEBUG_PRINTLN(F("Setting sample rate to 200Hz..."));
+            ground_.sendString("Setting sample rate to 200Hz...");
             setRate(4); // 1khz / (1 + 4) = 200 Hz
 
-            DEBUG_PRINTLN(F("Setting external frame sync to TEMP_OUT_L[0]..."));
+            //DEBUG_PRINTLN(F("Setting external frame sync to TEMP_OUT_L[0]..."));
+            ground_.sendString("Setting external frame sync to TEMP_OUT_L[0]...");
             setExternalFrameSync(MPU6050_EXT_SYNC_TEMP_OUT_L);
 
-            DEBUG_PRINTLN(F("Setting DLPF bandwidth to 42Hz..."));
+            //DEBUG_PRINTLN(F("Setting DLPF bandwidth to 42Hz..."));
+            ground_.sendString("Setting DLPF bandwidth to 42Hz...");
             setDLPFMode(MPU6050_DLPF_BW_42);
 
-            DEBUG_PRINTLN(F("Setting gyro sensitivity to +/- 2000 deg/sec..."));
+            //DEBUG_PRINTLN(F("Setting gyro sensitivity to +/- 2000 deg/sec..."));
+            ground_.sendString("Setting gyro sensitivity to +/- 2000 deg/sec...");
             setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
 
-            DEBUG_PRINTLN(F("Setting DMP configuration bytes (function unknown)..."));
+            //DEBUG_PRINTLN(F("Setting DMP configuration bytes (function unknown)..."));
+            ground_.sendString("Setting DMP configuration bytes (function unknown)...");
             setDMPConfig1(0x03);
             setDMPConfig2(0x00);
 
-            DEBUG_PRINTLN(F("Clearing OTP Bank flag..."));
+            //DEBUG_PRINTLN(F("Clearing OTP Bank flag..."));
+            ground_.sendString("Clearing OTP Bank flag...");
             setOTPBankValid(false);
 
-            DEBUG_PRINTLN(F("Setting X/Y/Z gyro offset TCs to previous values..."));
+            //DEBUG_PRINTLN(F("Setting X/Y/Z gyro offset TCs to previous values..."));
+            ground_.sendString("Setting X/Y/Z gyro offset TCs to previous values...");
             setXGyroOffsetTC(xgOffsetTC);
             setYGyroOffsetTC(ygOffsetTC);
             setZGyroOffsetTC(zgOffsetTC);
@@ -426,118 +465,157 @@ uint8_t MPU6050::dmpInitialize() {
             //setYGyroOffset(0);
             //setZGyroOffset(0);
 
-            DEBUG_PRINTLN(F("Writing final memory update 1/7 (function unknown)..."));
+            //DEBUG_PRINTLN(F("Writing final memory update 1/7 (function unknown)..."));
+            ground_.sendString("Writing final memory update 1/7 (function unknown)...");
             uint8_t dmpUpdate[16], j;
             uint16_t pos = 0;
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
             writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
-            DEBUG_PRINTLN(F("Writing final memory update 2/7 (function unknown)..."));
+            //DEBUG_PRINTLN(F("Writing final memory update 2/7 (function unknown)..."));
+            ground_.sendString("Writing final memory update 2/7 (function unknown)...");
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
             writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
-            DEBUG_PRINTLN(F("Resetting FIFO..."));
+            //DEBUG_PRINTLN(F("Resetting FIFO..."));
+            ground_.sendString("Resetting FIFO...");
             resetFIFO();
 
-            DEBUG_PRINTLN(F("Reading FIFO count..."));
+            //DEBUG_PRINTLN(F("Reading FIFO count..."));
+            ground_.sendString("Reading FIFO count...");
             uint16_t fifoCount = getFIFOCount();
             uint8_t fifoBuffer[128];
 
-            DEBUG_PRINT(F("Current FIFO count="));
-            DEBUG_PRINTLN(fifoCount);
+            //DEBUG_PRINT(F("Current FIFO count="));
+            ground_.sendString("Current FIFO count=");
+            //DEBUG_PRINTLN(fifoCount);
+            ground_.sendWord(fifoBuffer);
             getFIFOBytes(fifoBuffer, fifoCount);
 
-            DEBUG_PRINTLN(F("Setting motion detection threshold to 2..."));
+            //DEBUG_PRINTLN(F("Setting motion detection threshold to 2..."));
+            ground_.sendString("Setting motion detection threshold to 2...");
             setMotionDetectionThreshold(2);
 
-            DEBUG_PRINTLN(F("Setting zero-motion detection threshold to 156..."));
+            //DEBUG_PRINTLN(F("Setting zero-motion detection threshold to 156..."));
+            ground_.sendString("Setting zero-motion detection threshold to 156...");
             setZeroMotionDetectionThreshold(156);
 
-            DEBUG_PRINTLN(F("Setting motion detection duration to 80..."));
+            //DEBUG_PRINTLN(F("Setting motion detection duration to 80..."));
+            ground_.sendString("Setting motion detection duration to 80...");
             setMotionDetectionDuration(80);
 
-            DEBUG_PRINTLN(F("Setting zero-motion detection duration to 0..."));
+            //DEBUG_PRINTLN(F("Setting zero-motion detection duration to 0..."));
+            ground_.sendString("Setting zero-motion detection duration to 0...");
             setZeroMotionDetectionDuration(0);
 
-            DEBUG_PRINTLN(F("Resetting FIFO..."));
+            //DEBUG_PRINTLN(F("Resetting FIFO..."));
+            ground_.sendString("Resetting FIFO...");
             resetFIFO();
 
-            DEBUG_PRINTLN(F("Enabling FIFO..."));
+            //DEBUG_PRINTLN(F("Enabling FIFO..."));
+            ground_.sendString("Enabling FIFO...");
             setFIFOEnabled(true);
 
-            DEBUG_PRINTLN(F("Enabling DMP..."));
+            //DEBUG_PRINTLN(F("Enabling DMP..."));
+            ground_.sendString("Enabling DMP...");
             setDMPEnabled(true);
 
-            DEBUG_PRINTLN(F("Resetting DMP..."));
+            //DEBUG_PRINTLN(F("Resetting DMP..."));
+            ground_.sendString("Resetting DMP...");
             resetDMP();
 
-            DEBUG_PRINTLN(F("Writing final memory update 3/7 (function unknown)..."));
+            //DEBUG_PRINTLN(F("Writing final memory update 3/7 (function unknown)..."));
+            ground_.sendString("Writing final memory update 3/7 (function unknown)...");
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
             writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
-            DEBUG_PRINTLN(F("Writing final memory update 4/7 (function unknown)..."));
+            //DEBUG_PRINTLN(F("Writing final memory update 4/7 (function unknown)..."));
+            ground_.sendString("Writing final memory update 4/7 (function unknown)...");
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
             writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
-            DEBUG_PRINTLN(F("Writing final memory update 5/7 (function unknown)..."));
+            //DEBUG_PRINTLN(F("Writing final memory update 5/7 (function unknown)..."));
+            ground_.sendString("Writing final memory update 5/7 (function unknown)...");
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
             writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
-            DEBUG_PRINTLN(F("Waiting for FIFO count > 2..."));
+            //DEBUG_PRINTLN(F("Waiting for FIFO count > 2..."));
+            ground_.sendString("Waiting for FIFO count > 2...");
             while ((fifoCount = getFIFOCount()) < 3);
 
-            DEBUG_PRINT(F("Current FIFO count="));
-            DEBUG_PRINTLN(fifoCount);
-            DEBUG_PRINTLN(F("Reading FIFO data..."));
+            //DEBUG_PRINT(F("Current FIFO count="));
+            ground_.sendString("Current FIFO count=");
+            //DEBUG_PRINTLN(fifoCount);
+            ground_.sendWord(fifoCount);
+            //DEBUG_PRINTLN(F("Reading FIFO data..."));
+            ground_.sendString("Reading FIFO data...");
             getFIFOBytes(fifoBuffer, fifoCount);
 
-            DEBUG_PRINTLN(F("Reading interrupt status..."));
+            //DEBUG_PRINTLN(F("Reading interrupt status..."));
+            ground_.sendString("Reading interrupt status...");
 
-            DEBUG_PRINT(F("Current interrupt status="));
-            DEBUG_PRINTLNF(getIntStatus(), HEX);
+            //DEBUG_PRINT(F("Current interrupt status="));
+            ground_.sendString("Current interrupt status=");
+            //DEBUG_PRINTLNF(getIntStatus(), HEX);
+            ground_.sendByte(getIntStatus());
 
-            DEBUG_PRINTLN(F("Reading final memory update 6/7 (function unknown)..."));
+            //DEBUG_PRINTLN(F("Reading final memory update 6/7 (function unknown)..."));
+            ground_.sendString("Reading final memory update 6/7 (function unknown)...");
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
             readMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
-            DEBUG_PRINTLN(F("Waiting for FIFO count > 2..."));
+            //DEBUG_PRINTLN(F("Waiting for FIFO count > 2..."));
+            ground_.sendString("Waiting for FIFO count > 2...");
             while ((fifoCount = getFIFOCount()) < 3);
 
-            DEBUG_PRINT(F("Current FIFO count="));
-            DEBUG_PRINTLN(fifoCount);
+            //DEBUG_PRINT(F("Current FIFO count="));
+            ground_.sendString("Current FIFO count=");
+            //DEBUG_PRINTLN(fifoCount);
+            ground_.sendWord(fifoCount);
 
-            DEBUG_PRINTLN(F("Reading FIFO data..."));
+            //DEBUG_PRINTLN(F("Reading FIFO data..."));
+            ground_.sendString("Reading FIFO data...");
             getFIFOBytes(fifoBuffer, fifoCount);
 
-            DEBUG_PRINTLN(F("Reading interrupt status..."));
+            //DEBUG_PRINTLN(F("Reading interrupt status..."));
+            ground_.sendString("Reading interrupt status...");
 
-            DEBUG_PRINT(F("Current interrupt status="));
-            DEBUG_PRINTLNF(getIntStatus(), HEX);
+            //DEBUG_PRINT(F("Current interrupt status="));
+            ground_.sendString("Current interrupt status=");
+            //DEBUG_PRINTLNF(getIntStatus(), HEX);
+            ground_.sendByte(getIntStatus());
 
-            DEBUG_PRINTLN(F("Writing final memory update 7/7 (function unknown)..."));
+            //DEBUG_PRINTLN(F("Writing final memory update 7/7 (function unknown)..."));
+            ground_.sendString("Writing final memory update 7/7 (function unknown)...");
             for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++) dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
             writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0], dmpUpdate[1]);
 
-            DEBUG_PRINTLN(F("DMP is good to go! Finally."));
+            //DEBUG_PRINTLN(F("DMP is good to go! Finally."));
+            ground_.sendString("DMP is good to go! Finally.");
 
-            DEBUG_PRINTLN(F("Disabling DMP (you turn it on later)..."));
+            //DEBUG_PRINTLN(F("Disabling DMP (you turn it on later)..."));
+            ground_.sendString("Disabling DMP (you turn it on later)...");
             setDMPEnabled(false);
 
-            DEBUG_PRINTLN(F("Setting up internal 42-byte (default) DMP packet buffer..."));
+            //DEBUG_PRINTLN(F("Setting up internal 42-byte (default) DMP packet buffer..."));
+            ground_.sendString("Setting up internal 42-byte (default) DMP packet buffer...");
             dmpPacketSize = 42;
             /*if ((dmpPacketBuffer = (uint8_t *)malloc(42)) == 0) {
                 return 3; // TODO: proper error code for no memory
             }*/
 
-            DEBUG_PRINTLN(F("Resetting FIFO and clearing INT status one last time..."));
+            //DEBUG_PRINTLN(F("Resetting FIFO and clearing INT status one last time..."));
+            ground_.sendString("Resetting FIFO and clearing INT status one last time...");
             resetFIFO();
             getIntStatus();
         } else {
-            DEBUG_PRINTLN(F("ERROR! DMP configuration verification failed."));
+            //DEBUG_PRINTLN(F("ERROR! DMP configuration verification failed."));
+            ground_.sendString("ERROR! DMP configuration verification failed.");
             return 2; // configuration block loading failed
         }
     } else {
-        DEBUG_PRINTLN(F("ERROR! DMP code verification failed."));
+        //DEBUG_PRINTLN(F("ERROR! DMP code verification failed."));
+        ground_.sendString("ERROR! DMP code verification failed.");
         return 1; // main binary block loading failed
     }
     return 0; // success
