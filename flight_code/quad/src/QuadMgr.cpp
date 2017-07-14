@@ -43,28 +43,12 @@ void Quad::QuadMgr::start()
 
     timer::Timer5 timer5;
 
-    ground_.sendString("F_CPU Kilo Hz is");
-    ground_.sendWord(timer::Timer16::F_CPU_KILO_HZ);
     timer5.setNormalMode();
     timer5.disableOutputCompare();
     timer5.setPrescaler(timer::PRESCALE256);
-    //timer5.millis();
 
-    //timer5.millis(true);
-    //_delay_ms(1000);
-    //timer5.millis();
-    while (true) {
-        if (timer5.millis() > 1000.0) {
-            ledMgr.toggle(led::BLUE);
-            timer5.millis(true);
-            ground_.sendString("heartbeat");
-        }
-      //ground_.sendString(".");
-    }
-
-    return;
-//    I2C i2c(ground_, timer5);
-//    i2c.scan();
+    I2C i2c(ground_, timer5);
+    i2c.scan();
 
     //twiMgr.writeByte(0x68, 0x6B, 1);
 

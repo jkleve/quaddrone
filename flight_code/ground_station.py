@@ -364,6 +364,7 @@ def gui():
 
 def main():
     global connection
+    global exit_threads
 
     timeout = 20  # Seconds
     start_time = time.time()

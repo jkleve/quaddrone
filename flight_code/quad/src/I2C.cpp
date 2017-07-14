@@ -166,8 +166,9 @@ void I2C::scan()
   //Serial.println();
   for(uint8_t s = 0; s <= 0x7F; s++)
   {
-    char string[8] = "Trying ";
-    string[7] = s;
+    char string[9] = "Trying ";
+    string[7] = static_cast<char>(s);
+    string[8] = '\0';
     ground_.sendString(string);
     returnStatus = 0;
     returnStatus = start();
@@ -196,7 +197,8 @@ void I2C::scan()
     stop();
   }
   //if(!totalDevicesFound){Serial.println(F("No devices found"));}
-  ground_.sendString("No device found");
+  if (!totalDevicesFound)
+    ground_.sendString("No device found");
   timeOutDelay = tempTime;
 }
 
