@@ -16,12 +16,15 @@ namespace ground {
 
     static const uint8_t HEADER_LEN = 1;
     static const uint8_t TWI_MSG_LEN = HEADER_LEN + 1;
-    static const uint8_t REGISTER_MSG_LEN = HEADER_LEN + 2;
+    static const uint8_t REGISTER_MSG_LEN = HEADER_LEN + 4; // lowRegByte, highRegByte, lowByte, highByte
+    static const uint8_t WORD_MSG_LEN = HEADER_LEN + 2;
 
     enum MsgType {
-        STRING = 0xff,
+        STRING      = 0xff,
         TWI_MESSAGE = 0xfe,
-        REGISTER = 0xfd
+        REGISTER    = 0xfd,
+        DATA        = 0xfc,
+        WORD        = 0xfb
     };
 
     struct Message {
@@ -32,14 +35,21 @@ namespace ground {
 
     class Ground {
     public:
+        static const uint8_t MAX_BUFFER_SIZE = 64;
+
         static Ground& reference();
-        void sendRegister(reg::Address register, uint8_t value);
+        void sendRegister( reg::Address register,
+                           uint8_t lowByte,
+                           uint8_t highByte = 0);
         void sendString(const char* string);
         void sendTwiMessage(uint8_t twi_message);
+        void sendData(uint8_t* data, uint8_t nData);
+        void sendWord(uint16_t word);
         void test();
     private:
         Ground();
 
+        uint8_t buffer_[MAX_BUFFER_SIZE];
         comms::CommsMgr& comms_;
     };
 }

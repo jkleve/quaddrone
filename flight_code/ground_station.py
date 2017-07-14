@@ -21,7 +21,7 @@ MESSAGE_LOG_LEVEL = 25
 # Add the newly created log level
 logging.addLevelName(MESSAGE_LOG_LEVEL, "MESSAGE")
 # Set the format for logging and set log level
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
 
 def log_message(message):
@@ -126,12 +126,14 @@ REGISTERS = dict([
     (0x9C, 'OCR3C'),
     (0xB8, 'TWBR'),
     (0xB9, 'TWSR'),
-    (0xBC, 'TWCR')
+    (0xBC, 'TWCR'),
+    (0x124, 'TCNT5')
 ])
 
 CHECKSUM_LEN = 1
 TWI_MSG_LEN = 1
-REGISTER_LEN = 2
+REGISTER_LEN = 4
+WORD_LEN = 2
 
 
 class Receiver:
@@ -139,6 +141,8 @@ class Receiver:
         'string': 0xff,
         'twi_msg': 0xfe,
         'register': 0xfd,
+        'data': 0xfc,
+        'word': 0xfb,
         'test': 0x48,
         'end': 0x00
     }
@@ -165,20 +169,34 @@ class Receiver:
         header: the mode
         data: data and checksum. Checksum is the last byte
         """
+        received_checksum = data[-1]
+        data = data[0:-1]
 
         # Append header to front and calculate and compare checksum
-        checksum = get_checksum([header] + data[0:-1])
+        checksum = get_checksum([header] + data)
 
-        if checksum != data[-1]:
+        if checksum != received_checksum:
+            try:  # See if we can get the message type
+                header_name = self._mode_to_string[header]
+            except KeyError:
+                header_name = "unknown ({})".format(str(header))
+
+            # Get different forms of data
+            data_hex = [hex(d) for d in data]
+            data_str = [chr(d) for d in data]
+
             logging.warning("\n Received bad checksum (calculated {} != {})"
-                            "\n with data {}".format(checksum, data[-1], data[0:-1]))
-            return Packet(header, data[0:-1], checksum, False)
-        return Packet(header, data[0:-1], checksum, True)
+                            "\n with header {} and data {}"
+                            "\n hex {}"
+                            "\n str {}".format(checksum, received_checksum, header_name, data, data_hex, data_str))
+            return Packet(header, data, checksum, False)
 
-    def get_data(self, size=None):
+        return Packet(header, data, checksum, True)
+
+    def get_data(self, size):
         """
         Receive the data section of the packet
-        :return: Data section of packet received. None if we timedout before 'end' was recieved
+        :return: Data section of packet received. None if we timeout before 'end' was received
         """
         start = time.time()
         data = list()
@@ -261,8 +279,16 @@ class Receiver:
             logging.warning("\n Received unexpected number of bytes in register mode"
                             "\n {} instead of {} bytes".format(len(data), REGISTER_LEN))  # TODO +1 for length?
 
-        if len(data) >= REGISTER_LEN:
-            log_message("(register {}) {}".format(REGISTERS[data[0]], data[1]))
+        value = (data[3] << 8) + data[2]
+        register = (data[1] << 8) + data[0]
+
+        try:
+            register_name = REGISTERS[register]
+        except KeyError:
+            logging.warning("Register {} does not exist."
+                            "Data in unknown register: {}".format(hex(register), value))
+        else:
+            log_message("(register {}) {}".format(register_name, value))
 
     def twi_msg(self, header):
         data = self.get_data(TWI_MSG_LEN)
@@ -283,6 +309,37 @@ class Receiver:
             log_message("(twi_msg) {}".format(TWI_MESSAGES[twi_mode]))
         except KeyError:
             logging.warning("Couldn't find TWI message {}".format(hex(twi_mode)))
+
+    def data(self, header):
+        num_bytes = self.get_byte()
+        data = self.get_data(num_bytes)
+
+        if data is None:  # Failure
+            return
+
+        data.insert(0, num_bytes)
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = [hex(d) for d in packet.data[1:]]  # Get the data, excluding the num_bytes
+        log_message("(data) {}".format(data))
+
+    def word(self, header):
+        data = self.get_data(WORD_LEN)
+
+        if data is None:  # Failure
+            return
+
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = packet.data
+        word = (data[1] << 8) + data[0]
+        log_message("(word) {}".format(word))
 
     def hunting(self):
         b = self.get_byte()
@@ -310,7 +367,7 @@ def gui():
 
 
 if __name__ == '__main__':
-    timeout = 10  # Seconds
+    timeout = 20  # Seconds
     start_time = time.time()
     ports = ['/dev/ttyACM0', '/dev/ttyACM1', '/dev/ttyACM2', '/dev/ttyUSB0']
 

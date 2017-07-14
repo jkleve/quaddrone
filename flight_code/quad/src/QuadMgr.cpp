@@ -9,7 +9,9 @@ extern "C" {
 }
 
 #include "QuadMgr.h"
+#include "I2C.h"
 #include "Timer3.h"
+#include "Timer5.h"
 
 Quad::QuadMgr::QuadMgr() :
     ledMgr( led::LedMgr::reference() ),
@@ -39,20 +41,30 @@ void Quad::QuadMgr::start()
     _delay_ms(1000);
     ledMgr.toggle(led::BLUE);
 
-    timer3_.setNormalMode();
-    timer3_.disableOutputCompare();
-    timer3_.setPrescaler(timer::Prescaler::PRESCALE256); // TODO
-    timer3_.setMs(1000);
-    timer3_.start();
+    timer::Timer5 timer5;
 
+    ground_.sendString("F_CPU Kilo Hz is");
+    ground_.sendWord(timer::Timer16::F_CPU_KILO_HZ);
+    timer5.setNormalMode();
+    timer5.disableOutputCompare();
+    timer5.setPrescaler(timer::PRESCALE256);
+    //timer5.millis();
+
+    //timer5.millis(true);
+    //_delay_ms(1000);
+    //timer5.millis();
     while (true) {
-        if (timer3_.check()) {
-            ledMgr.toggle(led::YELLOW);
-            ground_.sendString("Interrupt ...");
-            timer3_.reset();
+        if (timer5.millis() > 1000.0) {
+            ledMgr.toggle(led::BLUE);
+            timer5.millis(true);
+            ground_.sendString("heartbeat");
         }
-        //ground_.sendRegister(reg::TIMER3_COUNTER, TCNT3);
+      //ground_.sendString(".");
     }
+
+    return;
+//    I2C i2c(ground_, timer5);
+//    i2c.scan();
 
     //twiMgr.writeByte(0x68, 0x6B, 1);
 

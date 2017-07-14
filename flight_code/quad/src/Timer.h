@@ -6,6 +6,7 @@
 #define TIMER_H
 
 #include <stdint.h>
+#include "Ground.h"
 
 namespace timer {
     enum Timer {
@@ -52,11 +53,14 @@ namespace timer {
 
     class Timer16 {
     public:
+        static const uint16_t F_CPU_KILO_HZ= F_CPU / 1000;
+
         bool setMs(uint16_t); // max is a decent amount less than 2000 ms. Otherwise
         // we need to divide the clock by 1024 instead
         void start();
         bool check();
         void reset();
+        uint16_t millis(bool restart = false);
         void setNormalMode();
         void disableOutputCompare(); // TODO temporary
         void setOutputCompare(OutputCompareMode mode);
@@ -83,16 +87,29 @@ namespace timer {
         uint16_t divider_;
 
         // Pointer holders
-        uint8_t control_a_reg8_;
-        uint8_t control_b_reg8_;
-        uint8_t control_c_reg8_;
+        //uint8_t control_a_reg8_;
+        //uint8_t control_b_reg8_;
+        //uint8_t control_c_reg8_;
+        //uint16_t counter_reg16_; // counter addresses need 2 bytes
+        //uint8_t input_capture_reg16_;
+        //uint8_t output_compare_a_reg16_;
+        //uint8_t output_compare_b_reg16_;
+        //uint8_t output_compare_c_reg16_;
+        //uint8_t interrupt_flag_reg8_;
+        //uint8_t interrupt_mask_reg8_;
+
+        uint16_t control_a_reg8_; // temporary until I decide what to do about timer5's register addresses being 2 bytes
+        uint16_t control_b_reg8_;
+        uint16_t control_c_reg8_;
         uint16_t counter_reg16_; // counter addresses need 2 bytes
-        uint8_t input_capture_reg16_;
-        uint8_t output_compare_a_reg16_;
-        uint8_t output_compare_b_reg16_;
-        uint8_t output_compare_c_reg16_;
-        uint8_t interrupt_flag_reg8_;
-        uint8_t interrupt_mask_reg8_;
+        uint16_t input_capture_reg16_;
+        uint16_t output_compare_a_reg16_;
+        uint16_t output_compare_b_reg16_;
+        uint16_t output_compare_c_reg16_;
+        uint16_t interrupt_flag_reg8_;
+        uint16_t interrupt_mask_reg8_;
+
+        ground::Ground& ground_;
     };
 }
 

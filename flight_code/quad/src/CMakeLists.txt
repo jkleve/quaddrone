@@ -10,6 +10,7 @@ add_avr_executable(
    QuadState.cpp
    QuadMgr.cpp
    QuadParams.cpp
+   I2C.cpp
    InterruptMgr.cpp
    LedMgr.cpp
    #Mpu.cpp
@@ -17,6 +18,7 @@ add_avr_executable(
    Timer0.cpp
    Timer1.cpp
    Timer3.cpp
+   Timer5.cpp
    TwiMgr.cpp
    #ImuMgr.cpp
    )

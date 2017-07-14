@@ -4,6 +4,7 @@
 
 #include "Registers.h"
 #include "Timer.h"
+#include "Ground.h"
 
 timer::Timer16::Timer16( reg::Address control_a_reg,
                 reg::Address control_b_reg,
@@ -28,7 +29,8 @@ timer::Timer16::Timer16( reg::Address control_a_reg,
     output_compare_b_reg16_( output_compare_b_reg ),
     output_compare_c_reg16_( output_compare_c_reg ),
     interrupt_flag_reg8_( input_capture_reg ),
-    interrupt_mask_reg8_( interrupt_mask_reg )
+    interrupt_mask_reg8_( interrupt_mask_reg ),
+    ground_( ground::Ground::reference() )
 {
     // Set control registers to zeros
     // These should be 0 upon initialization but
@@ -133,4 +135,27 @@ void timer::Timer16::setPrescaler(Prescaler prescaler)
 
 uint16_t timer::Timer16::getTime() {
     return _SFR_MEM16(counter_reg16_);
+}
+
+uint16_t timer::Timer16::millis(bool restart) {
+    // TODO this method doesn't have the greatest resolution
+    // TODO if you want to know when 1 second is up at 256 prescaler
+    // TODO you'll have to wait until 1.024 seconds because of integer
+    // TODO math. could convert to uint32_t and use F_CPU instead of kilo hz
+    // TODO or use floating point math. would need to test how much slower
+    // TODO this would cause this method. This method needs to be fast though
+    // TODO if it's going to be used a decent amount by the rambo/I2C
+    if (restart)
+        reset();
+
+    uint16_t ms = (_SFR_MEM16(counter_reg16_) / F_CPU_KILO_HZ) * divider_;
+    //ground_.sendRegister(reg::TIMER5_COUNTER, _SFR_MEM16(counter_reg16_), _SFR_MEM16(counter_reg16_) >> 8);
+
+    //ground_.sendWord(ms);
+    //ground_.sendString("Divider is ...");
+    //ground_.sendWord(divider_);
+    //ground_.sendWord(F_CPU_KILO_HZ);
+    //ground_.sendWord(_SFR_MEM16(counter_reg16_));
+
+    return ms;
 }

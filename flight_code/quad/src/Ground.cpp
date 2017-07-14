@@ -19,12 +19,14 @@ ground::Ground& ground::Ground::reference()
     return ref;
 }
 
-void ground::Ground::sendRegister(reg::Address reg, uint8_t value)
+void ground::Ground::sendRegister(reg::Address reg, uint8_t lowByte, uint8_t highByte)
 {
     uint8_t data[REGISTER_MSG_LEN];
     data[0] = REGISTER;
     data[1] = reg;
-    data[2] = value;
+    data[2] = reg >> 8;
+    data[3] = lowByte;
+    data[4] = highByte;
 
     comms_.sendMessage(data, REGISTER_MSG_LEN);
 }
@@ -62,9 +64,39 @@ void ground::Ground::sendString(const char* string)
     free(packet);
 }
 
+void ground::Ground::sendData(uint8_t *data, uint8_t nData)
+{
+    uint8_t packetLength = HEADER_LEN + nData + 1; // + 1 so we can put the size in the packet
+    buffer_[0] = DATA;
+    buffer_[1] = nData;
+    for (uint8_t i = 0; i < nData; i++)
+    {
+        buffer_[i+2] = data[i];
+    }
+
+    comms_.sendMessage(buffer_, packetLength);
+}
+
+void ground::Ground::sendWord(uint16_t word)
+{
+    buffer_[0] = WORD;
+    buffer_[1] = word;
+    buffer_[2] = word >> 8;
+
+    comms_.sendMessage(buffer_, WORD_MSG_LEN);
+}
+
 void ground::Ground::test()
 {
     sendString("Hello World");
+    sendString("Sending twi message START");
     sendTwiMessage(0x08);
+    sendString("Sending register TWI_CONTROL with value 0");
     sendRegister(reg::TWI_CONTROL, 0x00);
+    sendString("Sending data 4 3 2 1");
+    uint8_t data[4] = {4, 3, 2, 1};
+    sendData(data, 4);
+    sendString("Sending word 31250");
+    sendWord(31250);
 }
+
