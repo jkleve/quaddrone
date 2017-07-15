@@ -97,27 +97,13 @@
  *-----------------------------------------------------------
  */
 
-extern "C" {
-#include <avr/interrupt.h>
-}
-
 #include "QuadMgr.h"
-#include "SerialWrapper.h"
 
-using namespace serial;
-
-int main( void ) // TODO write a test that read 4 - 5 bytes with a blocking statment
-// before you start reading, start a timer, read the bytes, stop the timer, send the time back or 
-// write to EEPROM. i want to see if thats feasible to read them all in a row
+int main( void )
 {
-    Serial.print("Hello World!");
     // Initialize
-    //Quad::QuadMgr quadMgr;
-    //quadMgr.start();
-
-    //test::I2CAddrSearcher i2c;
-
-    //i2c.search();
+    Quad::QuadMgr quad;
+    quad.start();
 
     // Process loop
 
