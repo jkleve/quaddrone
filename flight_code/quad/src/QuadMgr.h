@@ -6,11 +6,12 @@
 #define EEPROM_CMAKE_TEST_QUAD_H
 
 #include "CommsMgr.h"
-#include "QuadState.h"
 #include "Eeprom.h"
 #include "InterruptMgr.h"
 #include "Ground.h"
 #include "LedMgr.h"
+#include "MPU6050.h"
+#include "QuadState.h"
 #include "Timer.h"
 
 namespace Quad {
@@ -39,6 +40,8 @@ namespace Quad {
         // TODO motor back_start
         // TODO motor back_port
         ground::Ground& ground_;
+
+        MPU6050 mpu;
     };
 }
 

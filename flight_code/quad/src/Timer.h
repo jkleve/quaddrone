@@ -111,9 +111,6 @@ namespace timer {
 
         ground::Ground& ground_;
     };
-
-    void setMillisTimer(Timer16 timer);
-    uint16_t millis();
 }
 
 

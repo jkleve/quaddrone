@@ -15,6 +15,8 @@ import time
 from threading import Thread
 from PyQt4 import QtGui, QtCore
 
+DATA_TIMEOUT = 0.020
+
 Packet = namedtuple('Packet', 'mode data checksum valid')
 
 # Create a new log level
@@ -208,7 +210,7 @@ class Receiver:
         size -= 1
 
         while size > 0:
-            if time.time() - start > 0.010:
+            if time.time() - start > DATA_TIMEOUT:
                 logging.warning("Timed out while getting data in mode {}".format(self.mode))
                 return None
 

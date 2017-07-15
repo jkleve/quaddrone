@@ -45,8 +45,7 @@ THE SOFTWARE.
 
 #include "I2Cdev.h"
 
-#include "SerialWrapper.h"
-#include "Timer.h"
+#include "ArduinoWrapper.h"
 
 using namespace serial;
 using namespace timer;

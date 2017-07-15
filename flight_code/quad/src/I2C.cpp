@@ -62,8 +62,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include "I2C.h"
-#include "SerialWrapper.h"
-#include "Timer.h"
+#include "ArduinoWrapper.h"
 
 using namespace serial;
 using namespace timer;

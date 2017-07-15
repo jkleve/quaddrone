@@ -160,17 +160,3 @@ uint16_t timer::Timer16::millis(bool restart) {
     return ms;
 }
 
-// Namespace global functions
-void timer::setMillisTimer(timer::Timer16 timer)
-{
-    // TODO this should set a timer, then when millis() is called, that timers millis() will be checked
-    timer.setNormalMode();
-    timer.disableOutputCompare();
-    timer.setPrescaler(timer::PRESCALE256);
-}
-
-uint16_t timer::millis()
-{
-    // TODO this will currently never cause a timeout which will be fine for testing
-    return 0;
-}
