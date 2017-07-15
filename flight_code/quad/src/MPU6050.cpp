@@ -35,14 +35,15 @@ THE SOFTWARE.
 */
 
 #include "MPU6050.h"
+#include <stdlib.h>
+#include <string.h>
 
 /** Default constructor, uses default I2C address.
  * @see MPU6050_DEFAULT_ADDRESS
  */
-MPU6050::MPU6050(ground::Ground& ground, I2C& i2c) :
+MPU6050::MPU6050(ground::Ground& ground) :
         devAddr( MPU6050_DEFAULT_ADDRESS ),
-        ground_( ground ),
-        i2c_( i2c )
+        ground_( ground )
 {
 }
 
@@ -52,10 +53,9 @@ MPU6050::MPU6050(ground::Ground& ground, I2C& i2c) :
  * @see MPU6050_ADDRESS_AD0_LOW
  * @see MPU6050_ADDRESS_AD0_HIGH
  */
-MPU6050::MPU6050(uint8_t address, ground::Ground& ground, I2C& i2c) :
+MPU6050::MPU6050(uint8_t address, ground::Ground& ground) :
         devAddr( address ),
-        ground_( ground ),
-        i2c_( i2c )
+        ground_( ground )
 {
 }
 
@@ -90,8 +90,7 @@ bool MPU6050::testConnection() {
  * @return I2C supply voltage level (0=VLOGIC, 1=VDD)
  */
 uint8_t MPU6050::getAuxVDDIOLevel() {
-    //I2Cdev::readBit(devAddr, MPU6050_RA_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, buffer);
-    i2c_.readBit(); // TODO
+    I2Cdev::readBit(devAddr, MPU6050_RA_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, buffer);
     return buffer[0];
 }
 /** Set the auxiliary I2C supply voltage level.
@@ -101,8 +100,7 @@ uint8_t MPU6050::getAuxVDDIOLevel() {
  * @param level I2C supply voltage level (0=VLOGIC, 1=VDD)
  */
 void MPU6050::setAuxVDDIOLevel(uint8_t level) {
-    //I2Cdev::writeBit(devAddr, MPU6050_RA_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, level);
-    i2c_.writeBit(); // TODO
+    I2Cdev::writeBit(devAddr, MPU6050_RA_YG_OFFS_TC, MPU6050_TC_PWR_MODE_BIT, level);
 }
 
 // SMPLRT_DIV register
@@ -129,8 +127,7 @@ void MPU6050::setAuxVDDIOLevel(uint8_t level) {
  * @see MPU6050_RA_SMPLRT_DIV
  */
 uint8_t MPU6050::getRate() {
-    //I2Cdev::readByte(devAddr, MPU6050_RA_SMPLRT_DIV, buffer);
-    i2c_.read(devAddr, MPU6050_RA_SMPLRT_DIV, buffer);
+    I2Cdev::readByte(devAddr, MPU6050_RA_SMPLRT_DIV, buffer);
     return buffer[0];
 }
 /** Set gyroscope sample rate divider.
@@ -139,8 +136,7 @@ uint8_t MPU6050::getRate() {
  * @see MPU6050_RA_SMPLRT_DIV
  */
 void MPU6050::setRate(uint8_t rate) {
-    //I2Cdev::writeByte(devAddr, MPU6050_RA_SMPLRT_DIV, rate);
-    i2c_.write(devAddr, MPU6050_RA_SMPLRT_DIV, rate);
+    I2Cdev::writeByte(devAddr, MPU6050_RA_SMPLRT_DIV, rate);
 }
 
 // CONFIG register
@@ -173,8 +169,7 @@ void MPU6050::setRate(uint8_t rate) {
  * @return FSYNC configuration value
  */
 uint8_t MPU6050::getExternalFrameSync() {
-    //I2Cdev::readBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT, MPU6050_CFG_EXT_SYNC_SET_LENGTH, buffer);
-    i2c_.readBits(); // TODO
+    I2Cdev::readBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT, MPU6050_CFG_EXT_SYNC_SET_LENGTH, buffer);
     return buffer[0];
 }
 /** Set external FSYNC configuration.
@@ -183,8 +178,7 @@ uint8_t MPU6050::getExternalFrameSync() {
  * @param sync New FSYNC configuration value
  */
 void MPU6050::setExternalFrameSync(uint8_t sync) {
-    //I2Cdev::writeBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT, MPU6050_CFG_EXT_SYNC_SET_LENGTH, sync);
-    i2c_.writeBits(); // TODO
+    I2Cdev::writeBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_EXT_SYNC_SET_BIT, MPU6050_CFG_EXT_SYNC_SET_LENGTH, sync);
 }
 /** Get digital low-pass filter configuration.
  * The DLPF_CFG parameter sets the digital low pass filter configuration. It
@@ -215,8 +209,7 @@ void MPU6050::setExternalFrameSync(uint8_t sync) {
  * @see MPU6050_CFG_DLPF_CFG_LENGTH
  */
 uint8_t MPU6050::getDLPFMode() {
-    //I2Cdev::readBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, buffer);
-    i2c_.readBits(); // TODO
+    I2Cdev::readBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, buffer);
     return buffer[0];
 }
 /** Set digital low-pass filter configuration.
@@ -228,8 +221,7 @@ uint8_t MPU6050::getDLPFMode() {
  * @see MPU6050_CFG_DLPF_CFG_LENGTH
  */
 void MPU6050::setDLPFMode(uint8_t mode) {
-    //I2Cdev::writeBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, mode);
-    i2c_.writeBits(); // TODO
+    I2Cdev::writeBits(devAddr, MPU6050_RA_CONFIG, MPU6050_CFG_DLPF_CFG_BIT, MPU6050_CFG_DLPF_CFG_LENGTH, mode);
 }
 
 // GYRO_CONFIG register
@@ -252,8 +244,7 @@ void MPU6050::setDLPFMode(uint8_t mode) {
  * @see MPU6050_GCONFIG_FS_SEL_LENGTH
  */
 uint8_t MPU6050::getFullScaleGyroRange() {
-    //I2Cdev::readBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, buffer);
-    i2c_.readBits(); // TODO
+    I2Cdev::readBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, buffer);
     return buffer[0];
 }
 /** Set full-scale gyroscope range.
@@ -265,8 +256,7 @@ uint8_t MPU6050::getFullScaleGyroRange() {
  * @see MPU6050_GCONFIG_FS_SEL_LENGTH
  */
 void MPU6050::setFullScaleGyroRange(uint8_t range) {
-    //I2Cdev::writeBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range);
-    i2c_.writeBits(); // TODO
+    I2Cdev::writeBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range);
 }
 
 // SELF TEST FACTORY TRIM VALUES
@@ -276,10 +266,8 @@ void MPU6050::setFullScaleGyroRange(uint8_t range) {
  * @see MPU6050_RA_SELF_TEST_X
  */
 uint8_t MPU6050::getAccelXSelfTestFactoryTrim() {
-    //I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_X, &buffer[0]);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_X, 1, &buffer[0]);
-	//I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_A, &buffer[1]);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_A, 1, &buffer[1]);
+    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_X, &buffer[0]);
+	I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_A, &buffer[1]);
     return (buffer[0]>>3) | ((buffer[1]>>4) & 0x03);
 }
 
@@ -288,10 +276,8 @@ uint8_t MPU6050::getAccelXSelfTestFactoryTrim() {
  * @see MPU6050_RA_SELF_TEST_Y
  */
 uint8_t MPU6050::getAccelYSelfTestFactoryTrim() {
-    //I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Y, &buffer[0]);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_Y, 1, &buffer[0]);
-	//I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_A, &buffer[1]);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_A, 1, &buffer[1]);
+    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Y, &buffer[0]);
+	I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_A, &buffer[1]);
     return (buffer[0]>>3) | ((buffer[1]>>2) & 0x03);
 }
 
@@ -300,8 +286,7 @@ uint8_t MPU6050::getAccelYSelfTestFactoryTrim() {
  * @see MPU6050_RA_SELF_TEST_Z
  */
 uint8_t MPU6050::getAccelZSelfTestFactoryTrim() {
-    //I2Cdev::readBytes(devAddr, MPU6050_RA_SELF_TEST_Z, 2, buffer);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_Z, 2, buffer);
+    I2Cdev::readBytes(devAddr, MPU6050_RA_SELF_TEST_Z, 2, buffer);
     return (buffer[0]>>3) | (buffer[1] & 0x03);
 }
 
@@ -310,8 +295,7 @@ uint8_t MPU6050::getAccelZSelfTestFactoryTrim() {
  * @see MPU6050_RA_SELF_TEST_X
  */
 uint8_t MPU6050::getGyroXSelfTestFactoryTrim() {
-    //I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_X, buffer);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_X, 1, buffer);
+    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_X, buffer);
     return (buffer[0] & 0x1F);
 }
 
@@ -320,8 +304,7 @@ uint8_t MPU6050::getGyroXSelfTestFactoryTrim() {
  * @see MPU6050_RA_SELF_TEST_Y
  */
 uint8_t MPU6050::getGyroYSelfTestFactoryTrim() {
-    //I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Y, buffer);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_Y, 1, buffer);
+    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Y, buffer);
     return (buffer[0] & 0x1F);
 }
 
@@ -330,8 +313,7 @@ uint8_t MPU6050::getGyroYSelfTestFactoryTrim() {
  * @see MPU6050_RA_SELF_TEST_Z
  */
 uint8_t MPU6050::getGyroZSelfTestFactoryTrim() {
-    //I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Z, buffer);
-    i2c_.read(devAddr, MPU6050_RA_SELF_TEST_Z, 1, buffer);
+    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Z, buffer);
     return (buffer[0] & 0x1F);
 }
 
@@ -342,8 +324,7 @@ uint8_t MPU6050::getGyroZSelfTestFactoryTrim() {
  * @see MPU6050_RA_ACCEL_CONFIG
  */
 bool MPU6050::getAccelXSelfTest() {
-    //I2Cdev::readBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, buffer);
-    i2c_.readBit(); // TODO
+    I2Cdev::readBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, buffer);
     return buffer[0];
 }
 /** Get self-test enabled setting for accelerometer X axis.
@@ -351,16 +332,14 @@ bool MPU6050::getAccelXSelfTest() {
  * @see MPU6050_RA_ACCEL_CONFIG
  */
 void MPU6050::setAccelXSelfTest(bool enabled) {
-    //I2Cdev::writeBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, enabled);
-    i2c_.writeBit(); // TODO
+    I2Cdev::writeBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_XA_ST_BIT, enabled);
 }
 /** Get self-test enabled value for accelerometer Y axis.
  * @return Self-test enabled value
  * @see MPU6050_RA_ACCEL_CONFIG
  */
 bool MPU6050::getAccelYSelfTest() {
-    //I2Cdev::readBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, buffer);
-    i2c_.readBit(); // TODO
+    I2Cdev::readBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, buffer);
     return buffer[0];
 }
 /** Get self-test enabled value for accelerometer Y axis.
@@ -368,16 +347,14 @@ bool MPU6050::getAccelYSelfTest() {
  * @see MPU6050_RA_ACCEL_CONFIG
  */
 void MPU6050::setAccelYSelfTest(bool enabled) {
-    //I2Cdev::writeBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, enabled);
-    i2c_.writeBit(); // TODO
+    I2Cdev::writeBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_YA_ST_BIT, enabled);
 }
 /** Get self-test enabled value for accelerometer Z axis.
  * @return Self-test enabled value
  * @see MPU6050_RA_ACCEL_CONFIG
  */
 bool MPU6050::getAccelZSelfTest() {
-    //I2Cdev::readBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, buffer);
-    i2c_.readBit(); // TODO
+    I2Cdev::readBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, buffer);
     return buffer[0];
 }
 /** Set self-test enabled value for accelerometer Z axis.
@@ -385,8 +362,7 @@ bool MPU6050::getAccelZSelfTest() {
  * @see MPU6050_RA_ACCEL_CONFIG
  */
 void MPU6050::setAccelZSelfTest(bool enabled) {
-    //I2Cdev::writeBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, enabled);
-    i2c_.writeBit(); // TODO
+    I2Cdev::writeBit(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_ZA_ST_BIT, enabled);
 }
 /** Get full-scale accelerometer range.
  * The FS_SEL parameter allows setting the full-scale range of the accelerometer

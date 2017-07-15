@@ -60,8 +60,6 @@
 //#endif
 
 #include <inttypes.h>
-#include "Ground.h"
-#include "Timer.h"
 
 #ifndef I2C_h
 #define I2C_h
@@ -92,7 +90,7 @@
 class I2C
 {
   public:
-    I2C(ground::Ground& ground, timer::Timer16& timer);
+    I2C();
     void begin();
     void end();
     void timeOut(uint16_t);
@@ -170,11 +168,8 @@ class I2C
     static uint8_t totalBytes;
     static uint16_t timeOutDelay;
 
-    ground::Ground& ground_;
-    timer::Timer16& timer_;
-
 };
 
-//extern I2C I2c;
+extern I2C I2c;
 
 #endif

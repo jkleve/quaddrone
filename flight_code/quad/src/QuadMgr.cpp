@@ -9,7 +9,7 @@ extern "C" {
 }
 
 #include "QuadMgr.h"
-#include "I2C.h"
+#include "I2Cdev.h"
 #include "Timer3.h"
 #include "Timer5.h"
 
@@ -20,8 +20,10 @@ Quad::QuadMgr::QuadMgr() :
     interruptMgr( Quad::InterruptMgr::reference() ),
     eepromMgr( Eeprom::EepromMgr::reference() ),
     timer3_( timer::Timer3() ),
+    timer5_( timer::Timer5() ),
     ground_( ground::Ground::reference() )
 {
+    timer::setMillisTimer(timer5_);
 	_delay_ms(1000);
     sei();
 }
@@ -44,14 +46,18 @@ void Quad::QuadMgr::start()
     timer5.disableOutputCompare();
     timer5.setPrescaler(timer::PRESCALE256);
 
-    I2C i2c(ground_, timer5);
-    uint8_t response = i2c.read(0x68, 0x75, 1);
+    //I2C i2c(ground_, timer5);
+    //uint8_t response = i2c.read(0x68, 0x75, 1);
+    uint8_t data[10];
+    int8_t response = I2Cdev::readByte(0x68, 0x75, data);
     ground_.sendString("Reading 0x75 from 0x68. Response:");
     ground_.sendByte(response);
 
-    if (i2c.available()) {
-        ground_.sendString("Received");
-        ground_.sendByte(i2c.receive());
+   if (response > 0) {
+        for (int8_t i = 0; i < response; i++) {
+            ground_.sendString("Received");
+            ground_.sendByte(data[i]);
+        }
     }
     //i2c.scan();
 
@@ -60,10 +66,10 @@ void Quad::QuadMgr::start()
     ledMgr.toggle(led::RED);
 
     // loop
-    //loop();
+    loop();
 }
 
-//void Quad::QuadMgr::loop() {
+void Quad::QuadMgr::loop() {
 //    do {
 //        interruptMgr.pollInterupts();
 //
@@ -94,4 +100,4 @@ void Quad::QuadMgr::start()
 //            break;
 //        }
 //    } while (true);
-//}
+}

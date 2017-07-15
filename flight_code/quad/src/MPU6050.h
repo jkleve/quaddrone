@@ -37,8 +37,8 @@ THE SOFTWARE.
 #ifndef _MPU6050_H_
 #define _MPU6050_H_
 
-#include "I2C.h"
 #include "Ground.h"
+#include "I2Cdev.h"
 
 // supporting link:  http://forum.arduino.cc/index.php?&topic=143444.msg1079517#msg1079517
 // also: http://forum.arduino.cc/index.php?&topic=141571.msg1062899#msg1062899s
@@ -436,8 +436,8 @@ THE SOFTWARE.
 
 class MPU6050 {
     public:
-        MPU6050( ground::Ground& ground, I2C& i2c );
-        MPU6050(uint8_t address, ground::Ground& ground, I2C& i2c);
+        MPU6050( ground::Ground& ground );
+        MPU6050(uint8_t address, ground::Ground& ground);
 
         void initialize();
         bool testConnection();
@@ -1028,7 +1028,6 @@ class MPU6050 {
     private:
         uint8_t devAddr;
         ground::Ground& ground_;
-        I2C& i2c_;
         uint8_t buffer[14];
 };
 

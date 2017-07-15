@@ -33,7 +33,7 @@ namespace Quad {
         // TODO timer2
         timer::Timer16 timer3_;
         // TODO timer4
-        // TODO timer5
+        timer::Timer16 timer5_;
         // TODO motor front_star
         // TODO motor front_port
         // TODO motor back_start

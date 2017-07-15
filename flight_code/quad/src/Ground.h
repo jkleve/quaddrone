@@ -37,7 +37,7 @@ namespace ground {
 
     class Ground {
     public:
-        static const uint8_t MAX_BUFFER_SIZE = 64;
+        static const uint8_t GROUND_MAX_BUFFER_SIZE = 64;
 
         static Ground& reference();
         void sendRegister( reg::Address register,
@@ -52,7 +52,7 @@ namespace ground {
     private:
         Ground();
 
-        uint8_t buffer_[MAX_BUFFER_SIZE];
+        uint8_t buffer_[GROUND_MAX_BUFFER_SIZE];
         comms::CommsMgr& comms_;
     };
 }

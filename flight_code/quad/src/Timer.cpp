@@ -148,7 +148,7 @@ uint16_t timer::Timer16::millis(bool restart) {
     if (restart)
         reset();
 
-    uint16_t ms = (_SFR_MEM16(counter_reg16_) / F_CPU_KILO_HZ) * divider_;
+    uint16_t ms = (_SFR_MEM16(counter_reg16_) / F_CPU_KILO_HZ) * divider_; // TODO we could refactor to get this calculation done once, then it'd be a lot quicker
     //ground_.sendRegister(reg::TIMER5_COUNTER, _SFR_MEM16(counter_reg16_), _SFR_MEM16(counter_reg16_) >> 8);
 
     //ground_.sendWord(ms);
@@ -158,4 +158,19 @@ uint16_t timer::Timer16::millis(bool restart) {
     //ground_.sendWord(_SFR_MEM16(counter_reg16_));
 
     return ms;
+}
+
+// Namespace global functions
+void timer::setMillisTimer(timer::Timer16 timer)
+{
+    // TODO this should set a timer, then when millis() is called, that timers millis() will be checked
+    timer.setNormalMode();
+    timer.disableOutputCompare();
+    timer.setPrescaler(timer::PRESCALE256);
+}
+
+uint16_t timer::millis()
+{
+    // TODO this will currently never cause a timeout which will be fine for testing
+    return 0;
 }

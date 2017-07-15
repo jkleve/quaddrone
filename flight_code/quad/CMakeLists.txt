@@ -132,6 +132,8 @@ add_definitions("-O2")
 add_definitions("-std=c++11") # added for singleton support in the way i've done it
 add_definitions("-fno-threadsafe-statics") # added because for some reason ?
 # wow I was bad with documenting my reasons for change here
+add_definitions("-DI2CDEV_IMPLEMENTATION=4") # Use I2C-Master-Library implementation in I2Cdev
+add_definitions("-DI2CDEV_SERIAL_DEBUG") # Added to print debug messages in I2Cdev library
 
 ##########################################################################
 # include search paths

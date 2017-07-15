@@ -27,3 +27,18 @@ void serial::SerialWrapper::print(uint8_t data, serial::SerialType type)
     }
 }
 
+void serial::SerialWrapper::println(const char* string)
+{
+    print(string);
+}
+
+void serial::SerialWrapper::println()
+{
+    print("");
+}
+
+void serial::SerialWrapper::println(uint8_t data, serial::SerialType type)
+{
+    print(data, type);
+}
+

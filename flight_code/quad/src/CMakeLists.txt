@@ -11,9 +11,10 @@ add_avr_executable(
    QuadMgr.cpp
    QuadParams.cpp
    I2C.cpp
+   I2Cdev.cpp
    InterruptMgr.cpp
    LedMgr.cpp
-   #MPU6050.cpp
+   MPU6050.cpp
    #Mpu.cpp
    SerialWrapper.cpp
    Timer.cpp

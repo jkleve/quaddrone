@@ -62,18 +62,19 @@
 #include <inttypes.h>
 #include <string.h>
 #include "I2C.h"
+#include "SerialWrapper.h"
+#include "Timer.h"
 
+using namespace serial;
+using namespace timer;
 
 uint8_t I2C::bytesAvailable = 0;
 uint8_t I2C::bufferIndex = 0;
 uint8_t I2C::totalBytes = 0;
 uint16_t I2C::timeOutDelay = 0;
 
-I2C::I2C(ground::Ground& ground, timer::Timer16& timer) : ground_( ground ), timer_( timer )
+I2C::I2C()
 {
-  timer_.setNormalMode();
-  timer_.disableOutputCompare();
-  timer_.setPrescaler(timer::PRESCALE256);
 }
 
 
@@ -161,15 +162,10 @@ void I2C::scan()
   uint16_t tempTime = timeOutDelay;
   timeOut(80);
   uint8_t totalDevicesFound = 0;
-  //Serial.println(F("Scanning for devices...please wait"));
-  ground_.sendString("Scanning for devices...please wait");
-  //Serial.println();
+  Serial.println("Scanning for devices...please wait");
+  Serial.println();
   for(uint8_t s = 0; s <= 0x7F; s++)
   {
-    char string[9] = "Trying ";
-    string[7] = static_cast<char>(s);
-    string[8] = '\0';
-    ground_.sendString(string);
     returnStatus = 0;
     returnStatus = start();
     if(!returnStatus)
@@ -180,25 +176,22 @@ void I2C::scan()
     {
       if(returnStatus == 1)
       {
-        //Serial.println(F("There is a problem with the bus, could not complete scan"));
-        ground_.sendString("Problem with bus");
+        Serial.println("There is a problem with the bus, could not complete scan");
         timeOutDelay = tempTime;
         return;
       }
     }
     else
     {
-      //Serial.print(F("Found device at address - "));
-      ground_.sendString("Found device address");
-      //Serial.print(F(" 0x"));
-      //Serial.println(s,HEX);
+      Serial.print("Found device at address - ");
+      Serial.print(" 0x");
+      Serial.println(s,HEX);
       totalDevicesFound++;
     }
     stop();
   }
-  //if(!totalDevicesFound){Serial.println(F("No devices found"));}
-  if (!totalDevicesFound)
-    ground_.sendString("No device found");
+  if(!totalDevicesFound)
+    Serial.println("No devices found");
   timeOutDelay = tempTime;
 }
 
@@ -575,12 +568,12 @@ uint8_t I2C::read(uint8_t address, uint8_t registerAddress, uint8_t numberBytes,
 
 uint8_t I2C::start()
 {
-  unsigned long startingTime = timer_.millis(true);
+  unsigned long startingTime = millis();
   TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
   while (!(TWCR & (1<<TWINT)))
   {
     if(!timeOutDelay){continue;}
-    if((timer_.millis() - startingTime) >= timeOutDelay)
+    if((millis() - startingTime) >= timeOutDelay)
     {
       lockUp();
       return(1);
@@ -603,12 +596,12 @@ uint8_t I2C::start()
 uint8_t I2C::sendAddress(uint8_t i2cAddress)
 {
   TWDR = i2cAddress;
-  unsigned long startingTime = timer_.millis(true);
+  unsigned long startingTime = millis();
   TWCR = (1<<TWINT) | (1<<TWEN);
   while (!(TWCR & (1<<TWINT)))
   {
     if(!timeOutDelay){continue;}
-    if((timer_.millis() - startingTime) >= timeOutDelay)
+    if((millis() - startingTime) >= timeOutDelay)
     {
       lockUp();
       return(1);
@@ -635,12 +628,12 @@ uint8_t I2C::sendAddress(uint8_t i2cAddress)
 uint8_t I2C::sendByte(uint8_t i2cData)
 {
   TWDR = i2cData;
-  unsigned long startingTime = timer_.millis(true);
+  unsigned long startingTime = millis();
   TWCR = (1<<TWINT) | (1<<TWEN);
   while (!(TWCR & (1<<TWINT)))
   {
     if(!timeOutDelay){continue;}
-    if((timer_.millis() - startingTime) >= timeOutDelay)
+    if((millis() - startingTime) >= timeOutDelay)
     {
       lockUp();
       return(1);
@@ -666,7 +659,7 @@ uint8_t I2C::sendByte(uint8_t i2cData)
 
 uint8_t I2C::receiveByte(uint8_t ack)
 {
-  unsigned long startingTime = timer_.millis(true);
+  unsigned long startingTime = millis();
   if(ack)
   {
     TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWEA);
@@ -679,7 +672,7 @@ uint8_t I2C::receiveByte(uint8_t ack)
   while (!(TWCR & (1<<TWINT)))
   {
     if(!timeOutDelay){continue;}
-    if((timer_.millis() - startingTime) >= timeOutDelay)
+    if((millis() - startingTime) >= timeOutDelay)
     {
       lockUp();
       return(1);
@@ -724,12 +717,12 @@ uint8_t I2C::receiveByte(uint8_t ack, uint8_t *target)
 
 uint8_t I2C::stop()
 {
-  unsigned long startingTime = timer_.millis(true);
+  unsigned long startingTime = millis();
   TWCR = (1<<TWINT)|(1<<TWEN)| (1<<TWSTO);
   while ((TWCR & (1<<TWSTO)))
   {
     if(!timeOutDelay){continue;}
-    if((timer_.millis() - startingTime) >= timeOutDelay)
+    if((millis() - startingTime) >= timeOutDelay)
     {
       lockUp();
       return(1);
@@ -745,5 +738,5 @@ void I2C::lockUp()
   TWCR = _BV(TWEN) | _BV(TWEA); //reinitialize TWI 
 }
 
-//I2C I2c = I2C();
+I2C I2c = I2C();
 
