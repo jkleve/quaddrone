@@ -101,18 +101,57 @@ class I2C
     void scan();
     uint8_t available();
     uint8_t receive();
-    uint8_t write(uint8_t, uint8_t);
-    uint8_t write(int, int); 
-    uint8_t write(uint8_t, uint8_t, uint8_t);
-    uint8_t write(int, int, int);
-    uint8_t write(uint8_t, uint8_t, char*);
-    uint8_t write(uint8_t, uint8_t, uint8_t*, uint8_t);
-    uint8_t read(uint8_t, uint8_t);
-    uint8_t read(int, int);
-    uint8_t read(uint8_t, uint8_t, uint8_t);
-    uint8_t read(int, int, int);
-    uint8_t read(uint8_t, uint8_t, uint8_t*);
-    uint8_t read(uint8_t, uint8_t, uint8_t, uint8_t*);
+    uint8_t write(uint8_t,  // Address
+                  uint8_t); // Register address
+
+    uint8_t write(int,      // Address
+                  int);     // Register address
+
+    uint8_t write(uint8_t,  // Address
+                  uint8_t,  // Register address
+                  uint8_t); // Data
+
+    uint8_t write(int,      // Address
+                  int,      // Register address
+                  int);     // Data
+
+    uint8_t write(uint8_t,  // Address
+                  uint8_t,  // Register address
+                  char*);   // Data
+
+    uint8_t write(uint8_t,  // Address
+                  uint8_t,  // Register address
+                  uint8_t*, // Data
+                  uint8_t); // Number of bytes
+
+    uint8_t writeBit();     // TODO
+    uint8_t writeBits();    // TODO
+
+    uint8_t read(uint8_t,   // Address
+                 uint8_t);  // Register number of bytes
+
+    uint8_t read(int,       // Address
+                 int);      // Number of bytes
+
+    uint8_t read(uint8_t,   // Address
+                 uint8_t,   // Register address
+                 uint8_t);  // Number of bytes
+
+    uint8_t read(int,       // Address
+                 int,       // Register address
+                 int);      // Number of bytes
+
+    uint8_t read(uint8_t,   // Address
+                 uint8_t,   // Number of bytes
+                 uint8_t*); // Data buffer
+
+    uint8_t read(uint8_t,   // Address
+                 uint8_t,   // Register address
+                 uint8_t,   // Number of bytes
+                 uint8_t*); // Data buffer
+
+    uint8_t readBit();  // TODO
+    uint8_t readBits(); // TODO
 
 
     uint8_t start();
@@ -130,11 +169,12 @@ class I2C
     static uint8_t bufferIndex;
     static uint8_t totalBytes;
     static uint16_t timeOutDelay;
+
     ground::Ground& ground_;
     timer::Timer16& timer_;
 
 };
 
-extern I2C I2c;
+//extern I2C I2c;
 
 #endif

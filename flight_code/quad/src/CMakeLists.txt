@@ -13,8 +13,9 @@ add_avr_executable(
    I2C.cpp
    InterruptMgr.cpp
    LedMgr.cpp
-   MPU6050.cpp
+   #MPU6050.cpp
    #Mpu.cpp
+   SerialWrapper.cpp
    Timer.cpp
    Timer0.cpp
    Timer1.cpp
