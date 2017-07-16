@@ -159,11 +159,12 @@ function(add_avr_executable EXECUTABLE_NAME)
    # elf file
    add_executable(${elf_file} EXCLUDE_FROM_ALL ${ARGN})
 
+   # had to add linking in full functional printf functions which also requires math library
    set_target_properties(
       ${elf_file}
       PROPERTIES
          COMPILE_FLAGS "-mmcu=${AVR_MCU}"
-         LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,--gc-sections -mrelax -Wl,-Map,${map_file}"
+         LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,-u,vfprintf -lprintf_flt -lm -Wl,--gc-sections -mrelax -Wl,-Map,${map_file}"
    )
 
    add_custom_command(

@@ -36,11 +36,11 @@ THE SOFTWARE.
 
 class Quaternion {
     public:
-        float w;
-        float x;
-        float y;
-        float z;
-        
+        double w; // avr-gcc float and double are the same thing
+        double x; // but sprintf was complaining that %f expects
+        double y; // type double. Changed these to doubles to
+        double z; // prevent the warning
+
         Quaternion() {
             w = 1.0f;
             x = 0.0f;

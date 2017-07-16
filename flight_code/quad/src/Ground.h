@@ -26,7 +26,8 @@ namespace ground {
         REGISTER    = 0xfd,
         DATA        = 0xfc,
         WORD        = 0xfb,
-        BYTE        = 0xfa
+        BYTE        = 0xfa,
+        QUATERNION  = 0xf9
     };
 
     struct Message {
@@ -48,6 +49,7 @@ namespace ground {
         void sendData(uint8_t* data, uint8_t nData);
         void sendWord(uint16_t word);
         void sendByte(uint8_t byte);
+        void sendQuaternion(const char* quat);
         void test();
     private:
         Ground();

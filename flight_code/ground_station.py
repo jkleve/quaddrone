@@ -143,6 +143,7 @@ class Receiver:
         'data': 0xfc,
         'word': 0xfb,
         'byte': 0xfa,
+        'quaternion': 0xf9,
         'test': 0x48,
         'end': 0x00
     }
@@ -354,6 +355,23 @@ class Receiver:
 
         data = packet.data
         log_message("(byte) {} ({})".format(data[0], hex(data[0])))
+
+    def quaternion(self, header):  # TODO this duplicates string() too much, I think it's time to refactor...
+        str_len = self.get_byte()
+        data = self.get_data(str_len)
+
+        if data is None:  # Failure
+            return
+
+        data.insert(0, str_len)
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = packet.data[1:]  # Get the data, excluding the str_len
+        s = ''.join([chr(b) for b in data])
+        log_message("(quaternion) {}".format(s))
 
     def hunting(self):
         b = self.get_byte()

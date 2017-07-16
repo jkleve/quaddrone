@@ -4,6 +4,7 @@
 
 #include "Ground.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -94,18 +95,53 @@ void ground::Ground::sendByte(uint8_t byte)
     comms_.sendMessage(buffer_, BYTE_MSG_LEN);
 }
 
+void ground::Ground::sendQuaternion(const char* quat)
+{
+    uint8_t nData = strlen(quat);
+    //uint8_t packetLength = HEADER_LEN + nData + 1;
+
+    // nData + 1 so we can put the string size in the data section of the packet
+    //uint8_t* packet = (uint8_t*) malloc( sizeof(uint8_t) * packetLength ); // TODO make buffer instead of malloc
+
+    // Copy the header into the packet
+    buffer_[0] = QUATERNION;
+    // Copy the size of the packet into data
+    buffer_[1] = nData;
+
+    // Copy the string into the packet
+    memcpy( &buffer_[2],
+            quat,
+            nData );
+
+    comms_.sendMessage(buffer_, HEADER_LEN + nData + 1);
+
+    //free(packet);
+}
+
 void ground::Ground::test()
 {
     sendString("Hello World");
+
     sendString("Sending twi message START");
     sendTwiMessage(0x08);
+
     sendString("Sending register TWI_CONTROL with value 0");
     sendRegister(reg::TWI_CONTROL, 0x00);
+
     sendString("Sending data 4 3 2 1");
     uint8_t data[4] = {4, 3, 2, 1};
     sendData(data, 4);
+
     sendString("Sending word 31250");
     sendWord(31250);
-}
 
+    sendString("Sending empty string");
+    sendString("");
+
+    sendString("Sending float number as string");
+    char floatString[5] = "test";
+    double testFLoat = 3.14;
+    sprintf(floatString, "%.2f", testFLoat);
+    sendString(floatString);
+}
 
