@@ -15,13 +15,19 @@ namespace comms {
 
     #define USART_BAUD	38400UL		// Define Baud rate
 
-    static const uint8_t END_PACKET = 0x00;
-
     class CommsMgr {
+
     public:
         static CommsMgr& reference();
         void sendMessage(const uint8_t* data, uint8_t nData);
+        uint8_t getMessage(uint8_t* data, uint8_t timeout=10);
+
     private:
+        static const uint8_t UPLINK_HEADER = 0x42;
+        static const uint8_t COMMS_BUFFER_SIZE = 8;
+
+        uint8_t buffer_[COMMS_BUFFER_SIZE];
+
         CommsMgr();
         uint8_t getChar(void);
         void putChar(uint8_t byte);

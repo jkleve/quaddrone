@@ -61,7 +61,10 @@ namespace timer {
         bool check();
         void reset();
         uint16_t millis(bool restart = false);
+        void setMode(Mode mode);
         void setNormalMode();
+        bool setFastPwm(uint8_t frequency);
+        void setDuty(float duty);
         void disableOutputCompare(); // TODO temporary
         void setOutputCompare(OutputCompareMode mode);
         void setPrescaler(Prescaler prescaler);

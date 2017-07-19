@@ -19,6 +19,7 @@ namespace ground {
     static const uint8_t REGISTER_MSG_LEN = HEADER_LEN + 4; // lowRegByte, highRegByte, lowByte, highByte
     static const uint8_t WORD_MSG_LEN = HEADER_LEN + 2;
     static const uint8_t BYTE_MSG_LEN = HEADER_LEN + 1;
+    static const uint8_t SIZE32_MSG_LEN = HEADER_LEN + 4;
 
     enum MsgType {
         STRING      = 0xff,
@@ -27,7 +28,9 @@ namespace ground {
         DATA        = 0xfc,
         WORD        = 0xfb,
         BYTE        = 0xfa,
-        QUATERNION  = 0xf9
+        QUATERNION  = 0xf9,
+        SIZE_32     = 0xf8,
+        THROTTLE    = 0xcf
     };
 
     struct Message {
@@ -48,8 +51,10 @@ namespace ground {
         void sendTwiMessage(uint8_t twi_message);
         void sendData(uint8_t* data, uint8_t nData);
         void sendWord(uint16_t word);
+        void send32(uint32_t data);
         void sendByte(uint8_t byte);
         void sendQuaternion(const char* quat);
+        Message getMessage();
         void test();
     private:
         Ground();

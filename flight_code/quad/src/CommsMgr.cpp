@@ -8,7 +8,10 @@ extern "C" {
 #include <avr/io.h>
 }
 
-comms::CommsMgr::CommsMgr()
+#include "ArduinoWrapper.h"
+using namespace serial;
+
+comms::CommsMgr::CommsMgr() : buffer_()
 {
     /* Asynchronous USART (UMSEL01 & UMSEL00 = 0)				  *
      * Parity Mode disabled (UPM01 & UPM00 = 0)					  *
@@ -39,7 +42,7 @@ comms::CommsMgr::CommsMgr()
 
 void comms::CommsMgr::putChar(uint8_t byte)
 {
-    while ((UCSR0A & (1 << UDRE0)) == 0);	// Wait for empty buffer
+    while ((UCSR0A & (1 << UDRE0)) == 0);	// Wait for empty buffer TODO need timeout
     UDR0 = byte; /* USART I/O Data Register */
 }
 
@@ -51,6 +54,7 @@ comms::CommsMgr &comms::CommsMgr::reference()
 
 uint8_t comms::CommsMgr::getChar(void)
 {
+    while ((UCSR0A & (1 << RXC0)) == 0);	// Wait for empty buffer TODO need timeout
     uint8_t byte = (uint8_t) UDR0;
     return byte;
 }
@@ -72,5 +76,45 @@ uint8_t comms::CommsMgr::getChecksum(const uint8_t* data, uint8_t nData)
         checksum += data[i];
     }
     return ~checksum;
+}
+
+uint8_t comms::CommsMgr::getMessage(uint8_t* data, uint8_t timeout)
+{
+    uint8_t nBytes = 0; // Total bytes received
+    uint8_t nData = 0;  // Number of data bytes received
+
+    uint8_t c = getChar();
+    buffer_[0] = c;
+    nBytes += 1;
+
+    switch (c) {
+        case UPLINK_HEADER:
+            nData = getChar();
+            buffer_[1] = nData;
+            nBytes += nData + 1; // + 1 for the nData byte
+            break;
+        default:
+            break;
+    }
+
+    for (uint8_t i = 0; i < nData; i++) {
+        buffer_[i+2] = getChar();
+    }
+
+    uint8_t checksum = getChar();
+
+    if (checksum == getChecksum(buffer_, nBytes)) {
+        Serial.print("Received data!");
+        Serial.print(buffer_[2], HEX);
+        // Transfer from buffer_ to data
+        for (uint8_t i = 0; i < nBytes; i++) {
+            data[i] = buffer_[i];
+        }
+    }
+    else {
+        Serial.print("Failed checksum");
+    }
+
+    return nBytes;
 }
 

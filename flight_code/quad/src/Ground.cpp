@@ -95,6 +95,17 @@ void ground::Ground::sendByte(uint8_t byte)
     comms_.sendMessage(buffer_, BYTE_MSG_LEN);
 }
 
+void ground::Ground::send32(uint32_t data)
+{
+    buffer_[0] = SIZE_32;
+    buffer_[1] = data;
+    buffer_[2] = data >> 8;
+    buffer_[3] = data >> 16;
+    buffer_[4] = data >> 24;
+
+    comms_.sendMessage(buffer_, SIZE32_MSG_LEN);
+}
+
 void ground::Ground::sendQuaternion(const char* quat)
 {
     uint8_t nData = strlen(quat);
@@ -116,6 +127,21 @@ void ground::Ground::sendQuaternion(const char* quat)
     comms_.sendMessage(buffer_, HEADER_LEN + nData + 1);
 
     //free(packet);
+}
+
+ground::Message ground::Ground::getMessage()
+{
+    uint8_t nBytes = comms_.getMessage(buffer_);
+    sendString("Received nBytes:");
+    sendByte(nBytes);
+    sendString("Received byte:");
+    sendByte(buffer_[2]);
+
+    Message message;
+    message.msgType = THROTTLE;
+    message.data = &buffer_[2];
+    message.nData = nBytes;
+    return message;
 }
 
 void ground::Ground::test()

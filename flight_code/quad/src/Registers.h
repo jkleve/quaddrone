@@ -25,6 +25,16 @@ namespace reg {
         TIMER4_INT_MASK = 0x72, // TIMSK4
         TIMER5_INT_MASK = 0x73, // TIMSK5
 
+        // Timer 1 registers
+        TIMER1_CONTROL_A        = 0x80, // TCCR1A
+        TIMER1_CONTROL_B        = 0x81, // TCCR1B
+        TIMER1_CONTROL_C        = 0x82, // TCCR1C
+        TIMER1_COUNTER          = 0x84, // TCNT1
+        TIMER1_INPUT_CAPTURE    = 0x86, // ICR1
+        TIMER1_OUTPUT_COMPARE_A = 0x88, // OCR1A
+        TIMER1_OUTPUT_COMPARE_B = 0x8A, // OCR1B
+        TIMER1_OUTPUT_COMPARE_C = 0x8C, // OCR1C
+
         // Timer 3 registers
         TIMER3_CONTROL_A        = 0x90, // TCCR3A
         TIMER3_CONTROL_B        = 0x91, // TCCR3B

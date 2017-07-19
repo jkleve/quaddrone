@@ -160,3 +160,99 @@ uint16_t timer::Timer16::millis(bool restart) {
     return ms;
 }
 
+void timer::Timer16::setMode(timer::Mode mode)
+{
+    // Turn off all mode bits to make it easy to set mode
+    _SFR_MEM8(control_a_reg8_) = _SFR_MEM8(control_a_reg8_) &
+                                 ~(_BV(WGM31) | _BV(WGM30));
+    _SFR_MEM8(control_b_reg8_) = _SFR_MEM8(control_b_reg8_) &
+                                 ~(_BV(WGM33) | _BV(WGM32));
+
+    switch (mode) {
+        case FAST_PWM:
+            _SFR_MEM8(control_a_reg8_) |= _BV(WGM31);
+            _SFR_MEM8(control_b_reg8_) |= _BV(WGM33) | _BV(WGM32);
+            break;
+        default:
+            break;
+    }
+}
+
+bool timer::Timer16::setFastPwm(uint8_t frequency)
+{
+    ground_.sendString("Frequency is");
+    ground_.sendByte(frequency);
+    uint16_t n = 0;
+    uint32_t temp = 65536;
+    uint32_t prescaler = (uint32_t) ((uint32_t)F_CPU /
+                                     (uint32_t)frequency /
+                                     temp);
+    setMode(FAST_PWM);
+
+    // Turn off all prescaler bits to make it easy to set
+    _SFR_MEM8(control_b_reg8_) = _SFR_MEM8(control_b_reg8_) &
+                                 ~(_BV(CS32) | _BV(CS31) | _BV(CS30));
+    // Turn off all output compare bits to make it easy to set
+    _SFR_MEM8(control_a_reg8_) = _SFR_MEM8(control_a_reg8_) &
+                                 ~(_BV(COM3A1) | _BV(COM3A0) |
+                                   _BV(COM3B1) | _BV(COM3B0) |
+                                   _BV(COM3C1) | _BV(COM3C0));
+
+    ground_.sendString("Here");
+    ground_.send32(F_CPU);
+    ground_.send32(temp);
+    ground_.sendByte(static_cast<uint8_t>(prescaler));
+    ground_.sendWord(static_cast<uint16_t>(prescaler));
+    ground_.send32(prescaler);
+    ground_.sendString("----");
+
+    if (prescaler < 1) {
+        _SFR_MEM8(control_b_reg8_) |= _BV(CS30);
+        ground_.sendString("1");
+        n = 1;
+    }
+    else if (prescaler < 8) {
+        _SFR_MEM8(control_b_reg8_) |= _BV(CS31);
+        ground_.sendString("8");
+        n = 8;
+    }
+    else if (prescaler < 64) {
+        _SFR_MEM8(control_b_reg8_) |= _BV(CS31) | _BV(CS30);
+        ground_.sendString("64");
+        n = 64;
+    }
+    else if (prescaler < 256) {
+        _SFR_MEM8(control_b_reg8_) |= _BV(CS32);
+        ground_.sendString("256");
+        n = 256;
+    }
+    else if (prescaler < 1024) {
+        _SFR_MEM8(control_b_reg8_) |= _BV(CS32) | _BV(CS30);
+        ground_.sendString("1024");
+        n = 1024;
+    }
+    else {
+        ground_.sendString("None :(");
+        return false; // 16 bit timer can't handle requested frequency
+    }
+
+    top_ = static_cast<uint16_t>( ( ( (uint32_t)F_CPU ) / (uint32_t)frequency / n) - 1 );
+    _SFR_MEM16(input_capture_reg16_) = top_;
+    _SFR_MEM16(output_compare_a_reg16_) = 0;
+    ground_.sendString("Setting top_ to:");
+    ground_.sendWord(top_);
+
+    // TODO move this to different method?
+    _SFR_MEM8(control_a_reg8_) |= _BV(COM3A1); // Set output compare A to clear on input compare match
+
+    return true;
+}
+
+void timer::Timer16::setDuty(float duty)
+{
+    ground_.sendWord(top_);
+    uint16_t tmp = static_cast<uint16_t>(duty/100.0 * top_);
+    ground_.sendWord(tmp);
+    _SFR_MEM16(output_compare_a_reg16_) = tmp;
+}
+

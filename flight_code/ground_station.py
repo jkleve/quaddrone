@@ -22,6 +22,7 @@ Packet = namedtuple('Packet', 'mode data checksum valid')
 # Create a new log level
 MESSAGE_LOG_LEVEL = 25
 
+
 def log_message(message):
     logging.log(MESSAGE_LOG_LEVEL, message)
 
@@ -29,62 +30,6 @@ def log_message(message):
 connection = None
 power = 0
 exit_threads = False
-
-
-class Widget(QtGui.QWidget):
-
-    def __init__(window):
-        """Function that initializes ground station"""
-        super(Widget, window).__init__()
-
-        window.col = QtGui.QColor(160, 160, 160)
-
-        # Throttle
-        window.progress_bar_t = QtGui.QProgressBar(window)
-        window.progress_bar_t.setGeometry(50, 50, 125, 75)
-        window.progress_bar_t.setOrientation(0x2)
-        window.progress_bar_t.setValue(power)
-
-        # Window Application Geometry
-        window.setGeometry(300, 300, 250, 150)
-        window.setWindowTitle('Motor Test')
-        window.show()
-
-    def keyPressEvent(window, eventQKeyEvent, setEnabled=False):
-        """This function enables any type of the keys listed below to be mapped onto some movement
-        Basic mode is
-        """
-        global power
-        key = eventQKeyEvent.key()
-        if key == 87:  # w
-            power += 5
-            # power = min(power, 25) # limiting to 25 for UART issue
-            power = min(power, 100)
-            print
-            window.progress_bar_t.setValue(power)
-            write(window, power)
-        elif key == 83:  # s
-            power -= 5
-            power = max(power, 0)
-            window.progress_bar_t.setValue(power)
-            write(window, power)
-        elif key == 85:  # u
-            power = 100
-            window.progress_bar_t.setValue(power)
-            write(window, power)
-        elif key == 32:  # space
-            power = 0
-            window.progress_bar_t.setValue(power)
-            write(window, power)
-        else:
-            power = 0
-            window.progress_bar_t.setValue(power)
-            write(window, power)
-            # eventQKeyEvent.ignore()
-
-
-def write(window, val):
-    data = connection.write(struct.pack('B', val))
 
 
 def get_checksum(data):
@@ -97,6 +42,74 @@ def get_checksum(data):
 
     # Get inverse and convert to unsigned
     return ~checksum + 2**8
+
+
+UPLINK_HEADER = 0x42
+
+
+def send_user_input(throttle):
+    packet = [UPLINK_HEADER, 1, throttle]
+    connection.write(struct.pack('B', packet[0]))
+    connection.write(struct.pack('B', packet[1]))
+    connection.write(struct.pack('B', packet[2]))
+    connection.write(struct.pack('B', get_checksum(packet)))
+
+
+class Widget(QtGui.QWidget):
+
+    def __init__(self):
+        """Function that initializes ground station"""
+        super(Widget, self).__init__()
+
+        self.col = QtGui.QColor(160, 160, 160)
+
+        # Throttle
+        self.progress_bar = QtGui.QProgressBar(self)
+        self.progress_bar.setGeometry(50, 50, 125, 75)
+        self.progress_bar.setOrientation(0x2)
+        self.progress_bar.setValue(power)
+
+        # Window Application Geometry
+        self.setGeometry(300, 300, 250, 150)
+        self.setWindowTitle('Motor Test')
+        self.show()
+
+    def keyPressEvent(self, event):
+        """This function enables any type of the keys listed below to be mapped onto some movement
+        Basic mode is
+        """
+        global power
+        key = event.key()
+        if key == ord('W'):
+            power += 5
+            # power = min(power, 25) # limiting to 25 for UART issue
+            power = min(power, 100)
+            print
+            self.progress_bar.setValue(power)
+            self.send(power)
+        elif key == ord('S'):
+            power -= 5
+            power = max(power, 0)
+            self.progress_bar.setValue(power)
+            self.send(power)
+        elif key == ord('U'):
+            power = 100
+            self.progress_bar.setValue(power)
+            self.send(power)
+        elif key == ord(' '):
+            power = 0
+            self.progress_bar.setValue(power)
+            self.send(power)
+        else:
+            power = 0
+            self.progress_bar.setValue(power)
+            self.send(power)
+            event.ignore()
+
+    @staticmethod
+    def send(throttle):
+        logging.info("Sending {}".format(throttle))
+        send_user_input(throttle)
 
 
 TWI_MESSAGES = dict([
@@ -133,6 +146,7 @@ TWI_MSG_LEN = 1
 REGISTER_LEN = 4
 WORD_LEN = 2
 BYTE_LEN = 1
+SIZE32_LEN = 4
 
 
 class Receiver:
@@ -144,6 +158,7 @@ class Receiver:
         'word': 0xfb,
         'byte': 0xfa,
         'quaternion': 0xf9,
+        'size32': 0xf8,
         'test': 0x48,
         'end': 0x00
     }
@@ -340,7 +355,7 @@ class Receiver:
 
         data = packet.data
         word = (data[1] << 8) + data[0]
-        log_message("(word) {}".format(word))
+        log_message("(word) {} ({})".format(word, hex(word)))
 
     def byte(self, header):
         data = self.get_data(BYTE_LEN)
@@ -355,6 +370,21 @@ class Receiver:
 
         data = packet.data
         log_message("(byte) {} ({})".format(data[0], hex(data[0])))
+
+    def size32(self, header):
+        data = self.get_data(SIZE32_LEN)
+
+        if data is None:  # Failure
+            return
+
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = packet.data
+        size_32 = (data[3] << 24) + (data[2] << 16) + (data[1] << 8) + data[0]
+        log_message("(size_32) {} ({})".format(size_32, hex(size_32)))
 
     def quaternion(self, header):  # TODO this duplicates string() too much, I think it's time to refactor...
         str_len = self.get_byte()
@@ -379,17 +409,6 @@ class Receiver:
             return self._mode_to_string[b]
         else:
             return None
-
-
-#def listen():
-#    try:
-#        while True:
-#            d = connection.read(1)
-#            if len(d) > 0:
-#                v = struct.unpack('B', d)[0]
-#                log_message("%s (%3d)" % (format(v, '#04x'), v))
-#    except Exception:
-#        logging.info("Disconnected. Device no longer available or double access.")
 
 
 def gui():
@@ -433,7 +452,9 @@ def main():
         logging.critical("Couldn't connect to device on any port")
         sys.exit(1)
 
-    #Thread(target=gui).start()
+    transmitter = Thread(target=gui)
+    transmitter.start()
+
     receiver = Receiver()
     listening_thread = Thread(target=receiver.run)
     listening_thread.start()
@@ -451,6 +472,7 @@ def main():
     finally:
         # Wait for threads to exit
         listening_thread.join()
+        transmitter.join()
         sys.exit(0)
 
 

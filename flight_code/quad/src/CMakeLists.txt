@@ -12,8 +12,9 @@ add_avr_executable(
    QuadParams.cpp
    I2C.cpp
    I2Cdev.cpp
-   InterruptMgr.cpp
+   #InterruptMgr.cpp
    LedMgr.cpp
+   Motor.cpp
    MPU6050.cpp
    MPU6050_6Axis_MotionApps20.h
    #Mpu.cpp

@@ -13,6 +13,7 @@ extern "C" {
 #include "QuadMgr.h"
 #include "MPU6050.h"
 #include "MPU6050_6Axis_MotionApps20.h"
+#include "Timer1.h"
 #include "Timer3.h"
 #include "Timer5.h"
 
@@ -20,10 +21,12 @@ Quad::QuadMgr::QuadMgr() :
     ledMgr( led::LedMgr::reference() ),
     commsMgr( comms::CommsMgr::reference() ),
     quadState( Quad::QuadState::reference() ),
-    interruptMgr( Quad::InterruptMgr::reference() ),
+    //interruptMgr( Quad::InterruptMgr::reference() ),
     eepromMgr( Eeprom::EepromMgr::reference() ),
+    timer1_( timer::Timer1() ),
     timer3_( timer::Timer3() ),
     timer5_( timer::Timer5() ),
+    motor1_( timer1_ ),
     ground_( ground::Ground::reference() ),
     mpu( MPU6050(ground_) )
 {
@@ -44,7 +47,7 @@ void Quad::QuadMgr::start()
 
     // orientation/motion vars
     Quaternion q;           // [w, x, y, z]         quaternion container
-    char quatString[20];
+    char quatString[21];
     //VectorInt16 aa;         // [x, y, z]            accel sensor measurements
     //VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
     //VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
@@ -60,6 +63,10 @@ void Quad::QuadMgr::start()
 
     _delay_ms(1000);
     ledMgr.toggle(led::BLUE);
+
+    loop();
+
+
 
     mpu.initialize();
 
@@ -118,8 +125,8 @@ void Quad::QuadMgr::start()
             // otherwise, check for DMP data ready interrupt (this should happen frequently)
         }
         else {
-
-            while (true) {
+            bool tmp  = true;
+            while (tmp == true) {
                 // wait for correct available data length, should be a VERY short wait
                 while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
 
@@ -133,9 +140,12 @@ void Quad::QuadMgr::start()
                 // display quaternion values in easy matrix form: w x y z
                 mpu.dmpGetQuaternion(&q, fifoBuffer);
 
-                // TODO send quaternion message
                 sprintf(quatString, "%.2f,%.2f,%.2f,%.2f", q.w, q.x, q.y, q.z);
                 ground_.sendQuaternion(quatString);
+
+                uint8_t power = static_cast<uint8_t>(30 * q.x);
+
+                motor1_.setPower(power);
             }
         }
     }
@@ -170,7 +180,12 @@ void Quad::QuadMgr::start()
 }
 
 void Quad::QuadMgr::loop() {
-//    do {
+    bool tmp = true; // Damn clion highlights the never ending loop as an error unless I do this
+    do {
+        ground::Message message = ground_.getMessage();
+
+        uint8_t power = message.data[0];
+        motor1_.setPower(power);
 //        interruptMgr.pollInterupts();
 //
 //        // Processesing to be done at 20Hz.
@@ -199,5 +214,5 @@ void Quad::QuadMgr::loop() {
 //            // de-init
 //            break;
 //        }
-//    } while (true);
+    } while (tmp);
 }
