@@ -45,6 +45,16 @@ namespace reg {
         TIMER3_OUTPUT_COMPARE_B = 0x9A, // OCR3B
         TIMER3_OUTPUT_COMPARE_C = 0x9C, // OCR3C
 
+        // Timer 4 registers
+        TIMER4_CONTROL_A        = 0xA0, // TCCR4A
+        TIMER4_CONTROL_B        = 0xA1, // TCCR4B
+        TIMER4_CONTROL_C        = 0xA2, // TCCR4C
+        TIMER4_COUNTER          = 0xA4, // TCNT4
+        TIMER4_INPUT_CAPTURE    = 0xA6, // ICR4
+        TIMER4_OUTPUT_COMPARE_A = 0xA8, // OCR4A
+        TIMER4_OUTPUT_COMPARE_B = 0xAA, // OCR4B
+        TIMER4_OUTPUT_COMPARE_C = 0xAc, // OCR4C
+
         // Twi
         TWI_BIT_RATE   = 0xB8,
         REG_TWI_STATUS = 0xB9,

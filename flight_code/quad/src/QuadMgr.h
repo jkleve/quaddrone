@@ -10,10 +10,10 @@
 //#include "InterruptMgr.h"
 #include "Ground.h"
 #include "LedMgr.h"
-#include "Motor.h"
-#include "MPU6050.h"
+#include "MotorManager.h"
 #include "QuadState.h"
 #include "Timer.h"
+#include "Mpu.h"
 
 namespace Quad {
 
@@ -34,16 +34,17 @@ namespace Quad {
         timer::Timer16 timer1_;
         // TODO timer2
         timer::Timer16 timer3_;
-        // TODO timer4
+        timer::Timer16 timer4_;
         timer::Timer16 timer5_;
+        motor::MotorManager motors_;
         // TODO motor front_star
-        motor::Motor motor1_;
+        //motor::Motor motor1_;
         // TODO motor front_port
         // TODO motor back_start
         // TODO motor back_port
         ground::Ground& ground_;
 
-        MPU6050 mpu;
+        mpu::MpuMgr mpu_;
     };
 }
 

@@ -132,10 +132,10 @@ void ground::Ground::sendQuaternion(const char* quat)
 ground::Message ground::Ground::getMessage()
 {
     uint8_t nBytes = comms_.getMessage(buffer_);
-    sendString("Received nBytes:");
-    sendByte(nBytes);
-    sendString("Received byte:");
-    sendByte(buffer_[2]);
+    //sendString("Received nBytes:");
+    //sendByte(nBytes);
+    //sendString("Received byte:");
+    //sendByte(buffer_[2]);
 
     Message message;
     message.msgType = THROTTLE;

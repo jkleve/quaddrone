@@ -20,7 +20,4 @@ timer::Timer3::Timer3() :
              reg::TIMER3_INT_MASK ),
     ground_( ground::Ground::reference() )
 {
-    ground_.sendRegister(reg::TIMER3_CONTROL_A, control_a_reg8_);
-    ground_.sendRegister(reg::TIMER3_CONTROL_B, control_b_reg8_);
-    ground_.sendRegister(reg::TIMER3_CONTROL_C, control_c_reg8_);
 }

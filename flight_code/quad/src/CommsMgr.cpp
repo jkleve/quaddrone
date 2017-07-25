@@ -104,8 +104,8 @@ uint8_t comms::CommsMgr::getMessage(uint8_t* data, uint8_t timeout)
     uint8_t checksum = getChar();
 
     if (checksum == getChecksum(buffer_, nBytes)) {
-        Serial.print("Received data!");
-        Serial.print(buffer_[2], HEX);
+        //Serial.print("Received data!");
+        //Serial.print(buffer_[2], HEX);
         // Transfer from buffer_ to data
         for (uint8_t i = 0; i < nBytes; i++) {
             data[i] = buffer_[i];

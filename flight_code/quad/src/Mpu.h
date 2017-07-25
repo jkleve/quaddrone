@@ -2,22 +2,21 @@
 // Created by jesse on 6/27/17.
 //
 
-#ifndef MPU_H
-#define MPU_H
+#pragma once
 
-//#include "I2Cdev.h" // Where is this?
-
-#include "MPU6050_6Axis_MotionApps20.h"
+#include "Ground.h"
+#include "MPU6050.h"
 
 namespace mpu {
 
     class MpuMgr {
     public:
-        MpuMgr(uint8_t address);
+        MpuMgr(ground::Ground&);
+        uint8_t getQuaternion(Quaternion&);
     private:
-        uint8_t address;
-        MPU6050 mpu;
+        MPU6050 mpu_;
+        ground::Ground& ground_;
+        bool initialized_;
     };
 }
 
-#endif // MPU_H

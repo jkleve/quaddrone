@@ -11,12 +11,13 @@ namespace motor {
 
     class Motor {
     public:
-        Motor(timer::Timer16& timer);
+        //Motor(timer::Timer16& timer);
+        Motor();
         void initialize();
-        void setPower(uint8_t power);
+        float getDuty(uint8_t power);
 
     private:
-        timer::Timer16& timer_;
+        //timer::Timer16& timer_;
     };
 }
 

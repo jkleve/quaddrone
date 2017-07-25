@@ -41,9 +41,8 @@ THE SOFTWARE.
 /** Default constructor, uses default I2C address.
  * @see MPU6050_DEFAULT_ADDRESS
  */
-MPU6050::MPU6050(ground::Ground& ground) :
-        devAddr( MPU6050_DEFAULT_ADDRESS ),
-        ground_( ground )
+MPU6050::MPU6050() :
+        devAddr( MPU6050_DEFAULT_ADDRESS )
 {
 }
 
@@ -53,9 +52,8 @@ MPU6050::MPU6050(ground::Ground& ground) :
  * @see MPU6050_ADDRESS_AD0_LOW
  * @see MPU6050_ADDRESS_AD0_HIGH
  */
-MPU6050::MPU6050(uint8_t address, ground::Ground& ground) :
-        devAddr( address ),
-        ground_( ground )
+MPU6050::MPU6050(uint8_t address) :
+        devAddr( address )
 {
 }
 

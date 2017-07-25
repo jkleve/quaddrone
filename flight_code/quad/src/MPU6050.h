@@ -438,8 +438,8 @@ THE SOFTWARE.
 
 class MPU6050 {
     public:
-        MPU6050( ground::Ground& ground );
-        MPU6050(uint8_t address, ground::Ground& ground);
+        MPU6050();
+        MPU6050(uint8_t address);
 
         void initialize();
         bool testConnection();
@@ -1029,7 +1029,6 @@ class MPU6050 {
 
     private:
         uint8_t devAddr;
-        ground::Ground& ground_;
         uint8_t buffer[14];
 };
 

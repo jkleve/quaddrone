@@ -15,14 +15,16 @@ add_avr_executable(
    #InterruptMgr.cpp
    LedMgr.cpp
    Motor.cpp
+   MotorManager.cpp
    MPU6050.cpp
    MPU6050_6Axis_MotionApps20.h
-   #Mpu.cpp
-        ArduinoWrapper.cpp
+   Mpu.cpp
+   ArduinoWrapper.cpp
    Timer.cpp
    Timer0.cpp
    Timer1.cpp
    Timer3.cpp
+   Timer4.cpp
    Timer5.cpp
    #ImuMgr.cpp
    )
