@@ -31,7 +31,7 @@
  *    _______________________________
  *    | . . . . . . . . . . . . . 4 | -    1: TCK         2: GND (Not used)
  *    | . . . . . . . . . . . . . . | +    3: TDO         4: VREF
- *    | . . . . 1 5 3 7 . . . . 6 10| s    5: TMS         6: RESET
+ *    | . . . . 1 5 3 9 . . . . 6 10| s    5: TMS         6: RESET
  *    -------------------------------      7: (Not used)  8: (Not used)
  *                                         9: TDI        10: GND
  *
@@ -106,6 +106,7 @@ int main( void )
     quad.start();
 
     // Process loop
+    quad.loop();
 
     return 0;
 }

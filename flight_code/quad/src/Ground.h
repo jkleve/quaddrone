@@ -7,6 +7,8 @@
 
 #include "CommsMgr.h"
 #include "Registers.h"
+#include "UserInput.h"
+#include "helper_3dmath.h"
 
 namespace comms {
     class CommsMgr;
@@ -30,8 +32,17 @@ namespace ground {
         BYTE        = 0xfa,
         QUATERNION  = 0xf9,
         SIZE_32     = 0xf8,
-        THROTTLE    = 0xcf
+        YAWPITCHROLL = 0xf7,
+        CONTROLS    = 0xcf
     };
+
+    enum Control {
+        YAW = 0,
+        PITCH = 1,
+        ROLL = 2,
+        THROTTLE = 3
+    };
+
 
     struct Message {
         uint8_t msgType;
@@ -54,6 +65,10 @@ namespace ground {
         void send32(uint32_t data);
         void sendByte(uint8_t byte);
         void sendQuaternion(const char* quat);
+        void sendQuaternion(Quaternion&);
+        void sendQuaternion(Quaternion*);
+        void sendYawPitchRoll(double[]);
+        bool received();
         Message getMessage();
         void test();
     private:

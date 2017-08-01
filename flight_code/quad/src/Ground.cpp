@@ -45,24 +45,22 @@ void ground::Ground::sendTwiMessage(uint8_t twi_message)
 void ground::Ground::sendString(const char* string)
 {
     uint8_t nData = strlen(string);
-    uint8_t packetLength = HEADER_LEN + nData + 1;
+    uint8_t packetLength = HEADER_LEN + 1 + nData; // Header, number of data bytes, data
 
     // nData + 1 so we can put the string size in the data section of the packet
-    uint8_t* packet = (uint8_t*) malloc( sizeof(uint8_t) * packetLength ); // TODO make buffer instead of malloc
+    //uint8_t* packet = (uint8_t*) malloc( sizeof(uint8_t) * packetLength ); // TODO make buffer instead of malloc
 
     // Copy the header into the packet
-    packet[0] = STRING;
+    buffer_[0] = STRING;
     // Copy the size of the packet into data
-    packet[1] = nData;
+    buffer_[1] = nData;
 
     // Copy the string into the packet
-    memcpy( &packet[2],
+    memcpy( &buffer_[2],
             string,
             nData );
 
-    comms_.sendMessage(packet, packetLength);
-
-    free(packet);
+    comms_.sendMessage(buffer_, packetLength);
 }
 
 void ground::Ground::sendData(uint8_t *data, uint8_t nData)
@@ -109,10 +107,6 @@ void ground::Ground::send32(uint32_t data)
 void ground::Ground::sendQuaternion(const char* quat)
 {
     uint8_t nData = strlen(quat);
-    //uint8_t packetLength = HEADER_LEN + nData + 1;
-
-    // nData + 1 so we can put the string size in the data section of the packet
-    //uint8_t* packet = (uint8_t*) malloc( sizeof(uint8_t) * packetLength ); // TODO make buffer instead of malloc
 
     // Copy the header into the packet
     buffer_[0] = QUATERNION;
@@ -124,9 +118,37 @@ void ground::Ground::sendQuaternion(const char* quat)
             quat,
             nData );
 
-    comms_.sendMessage(buffer_, HEADER_LEN + nData + 1);
+    comms_.sendMessage(buffer_, HEADER_LEN + 1 + nData);
+}
 
-    //free(packet);
+void ground::Ground::sendQuaternion(Quaternion& q)
+{
+    char quaternionString[28];
+    sprintf(quaternionString, "%.3f,%.3f,%.3f,%.3f", q.w, q.x, q.y, q.z);
+    sendQuaternion(quaternionString);
+}
+
+void ground::Ground::sendQuaternion(Quaternion* q)
+{
+    char quaternionString[28];
+    sprintf(quaternionString, "%.3f,%.3f,%.3f,%.3f", q->w, q->x, q->y, q->z);
+    sendQuaternion(quaternionString);
+}
+
+void ground::Ground::sendYawPitchRoll(double* ypr)
+{
+    static char yprString[24];
+    sprintf(yprString, "%.2lf,%.2lf,%.2lf", ypr[0], ypr[1], ypr[2]);
+
+    uint8_t nData = strlen(yprString);
+    buffer_[0] = YAWPITCHROLL;
+    buffer_[1] = nData;
+
+    memcpy( &buffer_[2],
+            yprString,
+            nData );
+
+    comms_.sendMessage(buffer_, HEADER_LEN + 1 + nData);
 }
 
 ground::Message ground::Ground::getMessage()
@@ -138,7 +160,7 @@ ground::Message ground::Ground::getMessage()
     //sendByte(buffer_[2]);
 
     Message message;
-    message.msgType = THROTTLE;
+    message.msgType = CONTROLS;
     message.data = &buffer_[2];
     message.nData = nBytes;
     return message;
@@ -171,3 +193,7 @@ void ground::Ground::test()
     sendString(floatString);
 }
 
+bool ground::Ground::received()
+{
+    return comms_.received();
+}

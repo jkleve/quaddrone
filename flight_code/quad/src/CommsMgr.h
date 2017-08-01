@@ -7,10 +7,6 @@
 
 #include <stdint.h>
 
-namespace ground {
-    struct Message;
-}
-
 namespace comms {
 
     #define USART_BAUD	38400UL		// Define Baud rate
@@ -21,6 +17,7 @@ namespace comms {
         static CommsMgr& reference();
         void sendMessage(const uint8_t* data, uint8_t nData);
         uint8_t getMessage(uint8_t* data, uint8_t timeout=10);
+        bool received();
 
     private:
         static const uint8_t UPLINK_HEADER = 0x42;

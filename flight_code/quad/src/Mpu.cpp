@@ -65,7 +65,7 @@ mpu::MpuMgr::MpuMgr( ground::Ground& ground ) : mpu_( MPU6050() ), ground_( grou
 // 3: FIFO overflow
 uint8_t mpu::MpuMgr::getQuaternion(Quaternion& quaternion)
 {
-    uint16_t packetSize = 0;    // expected DMP packet size (default is 42 bytes)
+    uint16_t packetSize = 42;    // TODO expected DMP packet size (default is 42 bytes)
     uint16_t fifoCount;     // count of all bytes currently in FIFO
     uint8_t fifoBuffer[64]; // FIFO storage buffer
 
@@ -82,8 +82,12 @@ uint8_t mpu::MpuMgr::getQuaternion(Quaternion& quaternion)
         }
         else { // otherwise, check for DMP data ready interrupt (this should happen frequently)
             // wait for correct available data length, should be a VERY short wait
-            if (mpu_.getFIFOCount() < packetSize)
+            if (mpu_.getFIFOCount() < packetSize) {
+                //ground_.sendString("Shit");
                 return 2;
+            }
+
+            // TODO periodically send number of bytes in fifo to see if we are filling up
 
             // read a packet from FIFO
             mpu_.getFIFOBytes(fifoBuffer, packetSize);
@@ -94,12 +98,28 @@ uint8_t mpu::MpuMgr::getQuaternion(Quaternion& quaternion)
 
             // display quaternion values in easy matrix form: w x y z
             mpu_.dmpGetQuaternion(&quaternion, fifoBuffer);
+            //uint8_t status = mpu_.dmpGetQuaternion(&q, fifoBuffer);
+            //ground_.sendString("dmpGetQuaternion status:");
+            //ground_.sendByte(status);
 
             //sprintf(quatString, "%.2f,%.2f,%.2f,%.2f", q.w, q.x, q.y, q.z);
             //ground_.sendQuaternion(quatString);
+
+            // TODO reset fifo. can we just get rid of all packets but one if there are more than 1 packet
+            // TODO in buffer?
+            //mpu_.resetFIFO();
 
             return 0;
         }
     }
     return 1;
+}
+
+uint8_t mpu::MpuMgr::getYawPitchRoll(double* yawPitchRoll)
+{
+    //getMpuPacket(); // TODO
+    getQuaternion(quaternion_);
+    mpu_.dmpGetGravity(&gravity_, &quaternion_);
+    mpu_.dmpGetYawPitchRoll(yawPitchRoll, &quaternion_, &gravity_);
+    return 0;
 }

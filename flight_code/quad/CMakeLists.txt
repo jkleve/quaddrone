@@ -55,7 +55,7 @@ message(STATUS "Current L_FUSE is set to: ${AVR_L_FUSE}")
 # set build type
 ##########################################################################
 if(NOT CMAKE_BUILD_TYPE)
-   set(CMAKE_BUILD_TYPE Release)
+   set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
 ##########################################################################
@@ -135,6 +135,7 @@ add_definitions("-fno-threadsafe-statics") # added because for some reason ?
 add_definitions("-DI2CDEV_IMPLEMENTATION=4") # Use I2C-Master-Library implementation in I2Cdev
 #add_definitions("-DI2CDEV_SERIAL_DEBUG") # Added to print debug messages in I2Cdev library
 add_definitions("-DMPU6050_INCLUDE_DMP_MOTIONAPPS20") # Added to include MPU6050_6Axis_MotionApps20 methods
+add_definitions("-ggdb") # Added for debugging
 
 ##########################################################################
 # include search paths

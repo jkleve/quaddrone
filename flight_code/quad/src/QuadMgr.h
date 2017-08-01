@@ -11,9 +11,10 @@
 #include "Ground.h"
 #include "LedMgr.h"
 #include "MotorManager.h"
+#include "Mpu.h"
 #include "QuadState.h"
 #include "Timer.h"
-#include "Mpu.h"
+#include "UserInput.h"
 
 namespace Quad {
 
@@ -21,14 +22,13 @@ namespace Quad {
     public:
         QuadMgr();
         void start();
+        void loop();
     private:
         led::LedMgr& ledMgr;
         comms::CommsMgr& commsMgr; // TODO make comms interface with usart class
         QuadState& quadState;
         //InterruptMgr& interruptMgr;
         Eeprom::EepromMgr& eepromMgr;
-
-        void loop();
 
         // TODO timer0
         timer::Timer16 timer1_;
@@ -45,6 +45,10 @@ namespace Quad {
         ground::Ground& ground_;
 
         mpu::MpuMgr mpu_;
+
+        quad::UserInput userInput_;
+        bool updateMotors_;
+        Quaternion quaternion;
     };
 }
 

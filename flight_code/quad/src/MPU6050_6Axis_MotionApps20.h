@@ -696,7 +696,7 @@ uint8_t MPU6050::dmpGetEuler(float *data, Quaternion *q) {
     data[2] = atan2(2*q -> y*q -> z - 2*q -> w*q -> x, 2*q -> w*q -> w + 2*q -> z*q -> z - 1);   // phi
     return 0;
 }
-uint8_t MPU6050::dmpGetYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity) {
+uint8_t MPU6050::dmpGetYawPitchRoll(double *data, Quaternion *q, VectorFloat *gravity) {
     // yaw: (about Z axis)
     data[0] = atan2(2*q -> x*q -> y - 2*q -> w*q -> z, 2*q -> w*q -> w + 2*q -> x*q -> x - 1);
     // pitch: (nose up/down, about Y axis)

@@ -59,6 +59,11 @@ uint8_t comms::CommsMgr::getChar(void)
     return byte;
 }
 
+bool comms::CommsMgr::received()
+{
+    return (UCSR0A & (1 << RXC0)) != 0; // receive complete flag in UART0 controller & status register A
+}
+
 void comms::CommsMgr::sendMessage(const uint8_t* data, uint8_t nData)
 {
     for (uint8_t i = 0; i < nData; i++) {
@@ -86,12 +91,16 @@ uint8_t comms::CommsMgr::getMessage(uint8_t* data, uint8_t timeout)
     uint8_t c = getChar();
     buffer_[0] = c;
     nBytes += 1;
+    Serial.print("Received:");
+    Serial.print(buffer_[0], HEX);
 
     switch (c) {
         case UPLINK_HEADER:
             nData = getChar();
             buffer_[1] = nData;
-            nBytes += nData + 1; // + 1 for the nData byte
+            nBytes += 1 + nData; // 1 for the nData byte + nData
+            Serial.print("Received:");
+            Serial.print(buffer_[1], HEX);
             break;
         default:
             break;
@@ -99,6 +108,8 @@ uint8_t comms::CommsMgr::getMessage(uint8_t* data, uint8_t timeout)
 
     for (uint8_t i = 0; i < nData; i++) {
         buffer_[i+2] = getChar();
+        Serial.print("Received:");
+        Serial.print(buffer_[i+2], HEX);
     }
 
     uint8_t checksum = getChar();
@@ -113,6 +124,7 @@ uint8_t comms::CommsMgr::getMessage(uint8_t* data, uint8_t timeout)
     }
     else {
         Serial.print("Failed checksum");
+        Serial.print(checksum, HEX);
     }
 
     return nBytes;

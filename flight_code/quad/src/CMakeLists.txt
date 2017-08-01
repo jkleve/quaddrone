@@ -26,7 +26,7 @@ add_avr_executable(
    Timer3.cpp
    Timer4.cpp
    Timer5.cpp
-   #ImuMgr.cpp
+   UserInput.cpp
    )
 
 #####################################################################

@@ -7,6 +7,7 @@ from collections import namedtuple
 from ctypes import *
 from errno import EACCES, EPERM
 import logging
+from math import degrees
 import serial
 from serial.serialutil import SerialException
 import signal
@@ -69,7 +70,10 @@ def send_user_input(input):
         if connection is not None:
             connection.write(struct.pack('B', byte))
     if connection is not None:
-        connection.write(struct.pack('B', get_checksum(packet)))
+        checksum = get_checksum(packet)
+        print("Checksum on ground is {}".format(checksum))
+        connection.write(struct.pack('B', checksum))
+        #connection.write(struct.pack('B', get_checksum(packet)))
     else:
         log_message("Debug mode")
 
@@ -253,6 +257,7 @@ class Receiver:
         'byte': 0xfa,
         'quaternion': 0xf9,
         'size32': 0xf8,
+        'yawpitchroll': 0xf7,
         'controls': 0xcf,
         'test': 0x48,
         'end': 0x00
@@ -498,6 +503,31 @@ class Receiver:
         s = ''.join([chr(b) for b in data])
         log_message("(quaternion) {}".format(s))
 
+    def yawpitchroll(self, header):
+        str_len = self.get_byte()
+        data = self.get_data(str_len)
+
+        if data is None:  # Failure
+            return
+
+        data.insert(0, str_len)
+        packet = self.assemble_packet(header, data)
+
+        if packet.valid is False:  # Failure
+            return
+
+        data = packet.data[1:]  # Get the data, excluding the str_len
+        s = ''.join([chr(b) for b in data])
+
+        # Split into yaw, pitch, & roll
+        try:
+            yaw, pitch, roll = [degrees(float(angle)) for angle in s.split(',')]
+        except ValueError:
+            logging.warning("Incorrect number of values in yawpitchroll string"
+                            "Data received: {}".format(s))
+        else:
+            log_message("(yawpitchroll) yaw:{:>7.1f} pitch:{:>7.1f} roll:{:>7.1f}".format(yaw, pitch, roll))
+
     def hunting(self):
         b = self.get_byte()
         if b in self.modes.values():
@@ -514,11 +544,13 @@ def gui():
 
 def transmitter():
     global exit_threads
-    global user_input_widget
+    #global user_input # TODO needed?
 
-    while exit_threads is False:
-        time.sleep(1.0/20.0)  # Run at 20 Hz
-        send_user_input(user_input.get_state())
+    #time.sleep(6.0)  # Wait 1 second for quat to initialize & test
+
+    #while exit_threads is False:
+    #    time.sleep(1.0/20.0)  # Run at 20 Hz
+    #    send_user_input(user_input.get_state())
 
 
 
@@ -597,7 +629,7 @@ if __name__ == '__main__':
     logging.addLevelName(MESSAGE_LOG_LEVEL, "MESSAGE")
     # Set the format for logging and set log level
     if args.ms is True:
-        logging.basicConfig(format='%(asctime)s.%(msecs)d %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
+        logging.basicConfig(format='%(asctime)s.%(msecs).3d %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
     else:
         logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 
