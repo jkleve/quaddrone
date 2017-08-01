@@ -95,6 +95,19 @@
  *          <port>: port        (usb)
  *          <name>: name of file/program
  *-----------------------------------------------------------
+ *  To debug avr microcontroller via MkII (Dragon) programmer:
+ *
+ *  1. Start avarice server
+ *   sudo avarice --dragon --jtag usb :<port>
+ *          <port>: port to use (4242)
+ *
+ *  2. Connect avr-gdb:
+ *   avr-gdb <program>.elf
+ *    target remove localhost:<port>
+ *          <port>: port used when avarice was started
+ *
+ *   NOTE: You must build the program with -g or -ggdb flag
+ *-----------------------------------------------------------
  */
 
 #include "QuadMgr.h"
